@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTheme } from './theme-provider';
+import { url } from 'inspector';
 
 interface HeaderProps {
   onLoginClick?: () => void;
@@ -33,27 +34,32 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
     { 
       name: "Personal Banking", 
       icon: UserRound,
-      color: "text-blue-600" 
+      color: "text-blue-600",
+      url : "/personal-banking"
     },
     { 
       name: "Business Banking", 
       icon: Building2,
-      color: "text-emerald-600" 
+      color: "text-emerald-600",
+      url : "/business-banking"
     },
     { 
       name: "Loans & Credit", 
       icon: HandCoins,
-      color: "text-amber-600" 
+      color: "text-amber-600", 
+      url : "/dashboard/services/loans"
     },
     { 
       name: "Cards", 
       icon: CreditCard,
-      color: "text-purple-600" 
+      color: "text-purple-600" ,
+      url : "/dashboard/cards"
     },
     { 
       name: "Grants & Aid", 
       icon: HeartHandshake,
-      color: "text-rose-600" 
+      color: "text-rose-600", 
+      url : "/dashboard/services/grants"
     },
   ];
 
@@ -102,7 +108,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
                     return (
                       <a 
                         key={index}
-                        href="#" 
+                        href={service.url}
                         className="group/item flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                       >
                         <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover/item:bg-white dark:group-hover/item:bg-gray-600 transition-colors">

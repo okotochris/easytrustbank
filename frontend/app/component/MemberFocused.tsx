@@ -37,7 +37,7 @@ export default function MemberFocused() {
                   <TrendingUp className="w-7 h-7 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-xl mb-2">Competitive Rates</h4>
+                  <h4 className="font-semibold text-xl mb-2  text-gray-700">Competitive Rates</h4>
                   <p className="text-gray-600">
                     Better rates on savings, loans, and credit cards designed to maximize your financial growth.
                   </p>
@@ -49,7 +49,7 @@ export default function MemberFocused() {
                   <Users className="w-7 h-7 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-xl mb-2">Member-Focused</h4>
+                  <h4 className="font-semibold text-xl mb-2  text-gray-700">Member-Focused</h4>
                   <p className="text-gray-600">
                     We’re owned by our members, not shareholders. Your success is our top priority.
                   </p>
@@ -61,7 +61,7 @@ export default function MemberFocused() {
                   <Heart className="w-7 h-7 text-rose-600" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-xl mb-2">Community Committed</h4>
+                  <h4 className="font-semibold text-xl mb-2  text-gray-700">Community Committed</h4>
                   <p className="text-gray-600">
                     Supporting local communities and causes that matter most to our members.
                   </p>
@@ -75,7 +75,7 @@ export default function MemberFocused() {
             <div className="space-y-6">
               <div className="aspect-square rounded-3xl overflow-hidden shadow-lg">
                 <img 
-                  src="https://picsum.photos/id/1015/600/600" 
+                  src="/image1.webp" 
                   alt="Happy family banking"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
@@ -92,14 +92,14 @@ export default function MemberFocused() {
             <div className="space-y-6 pt-12">
               <div className="aspect-square rounded-3xl overflow-hidden shadow-lg">
                 <img 
-                  src="https://picsum.photos/id/237/600/600" 
+                  src="/image2.webp" 
                   alt="Community support"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <div className="aspect-square rounded-3xl overflow-hidden shadow-lg">
                 <img 
-                  src="https://picsum.photos/id/1005/600/600" 
+                  src="/image3.webp" 
                   alt="Modern banking"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />

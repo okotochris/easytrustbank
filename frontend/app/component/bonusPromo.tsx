@@ -18,7 +18,7 @@ export default function BonusPromo({ onRegisterClick }: BonusPromoProps) {
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
               <img 
-                src="https://picsum.photos/id/201/800/600" 
+                src="/manlaptop.jpg" 
                 alt="Happy customer opening bank account"
                 className="w-full h-full object-cover rounded-3xl"
               />

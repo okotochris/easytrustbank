@@ -58,9 +58,9 @@ function Footer() {
               <a href="/about" className="hover:text-white transition-colors">About Us</a>
               <a href="/personal-banking" className="hover:text-white transition-colors">Personal Banking</a>
               <a href="/business-banking" className="hover:text-white transition-colors">Business Banking</a>
-              <a href="/loans-credit" className="hover:text-white transition-colors">Loans & Credit</a>
-              <a href="/cards" className="hover:text-white transition-colors">Cards</a>
-              <a href="/grants-aid" className="hover:text-white transition-colors">Grants & Aid</a>
+              <a href="/dashboard/services/loans" className="hover:text-white transition-colors">Loans & Credit</a>
+              <a href="/dashboard/services/cards" className="hover:text-white transition-colors">Cards</a>
+              <a href="/dashboard/services/grants-aid" className="hover:text-white transition-colors">Grants & Aid</a>
               <a href="/contact" className="hover:text-white transition-colors">Contact</a>
             </div>
           </div>

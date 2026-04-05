@@ -3,32 +3,39 @@
 
 import React from 'react';
 import { ArrowRight, Shield, Users, TrendingUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
 
 interface HeroProps {
   onRegisterClick: () => void;
 }
 
 export default function Hero({ onRegisterClick }: HeroProps) {
+  const router = useRouter();
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
       
-      {/* Background Image */}
+      {/* Background Image - Made BOLD and Visible */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat 
+                   scale-[1.08] brightness-110 contrast-125 saturate-110"
         style={{
-          backgroundImage: `url('https://picsum.photos/id/1015/2000/1200')`, // ← Replace this URL with your preferred image
+          backgroundImage: "url('/heroimage.jpg')",
         }}
       />
-      
-      {/* Dark Overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-indigo-950/85 to-violet-950/90"></div>
+
+      {/* Lighter Overlay - This is the key fix */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-950/70 via-indigo-950/65 to-violet-950/70"></div>
+
+      {/* Soft vignette to keep edges dark but center bright */}
+      <div className="absolute inset-0 bg-[radial-gradient(at_center,#00000000_40%,#00000080_100%)]"></div>
 
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:80px_80px]"></div>
 
-      {/* Glowing accent orbs */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-3xl"></div>
+      {/* Glowing orbs - Reduced intensity so they don't overpower the image */}
+      <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-[550px] h-[550px] bg-purple-500/15 rounded-full blur-3xl"></div>
 
       <div className="relative max-w-7xl mx-auto px-6 pt-20 pb-24 z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -79,18 +86,18 @@ export default function Hero({ onRegisterClick }: HeroProps) {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-8">
               <button
-                onClick={onRegisterClick}
+                onClick={() => router.push('/register')}
                 className="group bg-white hover:bg-blue-50 text-blue-950 px-10 py-5 rounded-3xl font-semibold text-lg flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 shadow-2xl"
               >
-                Get $250 Welcome Bonus
+                Open Account Today
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <button
-                onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
-                className="border-2 border-white/60 hover:border-white text-white px-9 py-5 rounded-3xl font-medium text-lg transition-all"
+                onClick={() => router.push('/dashboard')}
+                className="border-2 border-white/60 hover:border-white text-white px-9 py-5 rounded-3xl font-medium text-lg transition-all hover:bg-white/10"
               >
-                Discover More
+               Login
               </button>
             </div>
 
