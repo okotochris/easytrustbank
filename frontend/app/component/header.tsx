@@ -158,13 +158,13 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
             )}
             
             {onRegisterClick ? (
-              <button
-                onClick={onRegisterClick}
+              <Link
+               href={'/register'}
                 className="bg-linear-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white px-7 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/50 transition-all active:scale-[0.97]"
               >
                 Open Account 
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             ) : (
               <Link
                 href={'/register'}
