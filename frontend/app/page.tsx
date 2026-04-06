@@ -12,6 +12,7 @@ import BonusPromo from './component/bonusPromo';
 import MemberFocused from './component/MemberFocused';
 import Testimonials from './component/testimony';
 import BankingHours from './component/bankHours';
+import LoadingIndicator from './component/loading';
 
 export default function EasyTrustBank() {
   const [showRegister, setShowRegister] = useState(false);
@@ -150,20 +151,7 @@ export default function EasyTrustBank() {
         </div>
       )}
 
-      {/* LOGIN MODAL */}
-      {showLogin && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
-          <div className="bg-white rounded-3xl max-w-md w-full p-10">
-            <h2 className="text-3xl font-bold text-center mb-8">Welcome Back</h2>
-            <div className="space-y-6">
-              <input type="text" placeholder="Email or Username" className="w-full border rounded-2xl px-6 py-4" />
-              <input type="password" placeholder="Password" className="w-full border rounded-2xl px-6 py-4" />
-              <button onClick={fakeLoginSubmit} className="w-full bg-blue-700 text-white py-4 rounded-2xl font-semibold">Sign In Securely</button>
-            </div>
-            <button onClick={() => setShowLogin(false)} className="mt-6 text-gray-500 underline w-full text-sm">Close</button>
-          </div>
-        </div>
-      )}
+     <LoadingIndicator message="Processing your transfer..." />
     </div>
   );
 }
