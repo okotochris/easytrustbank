@@ -31,17 +31,17 @@ export default function LoansCredit() {
       <Header onLoginClick={() => setShowLogin(true)} onRegisterClick={() => setShowRegister(true)} />
 
       {/* HERO SECTION */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-bold mb-6 text-gray-900">Loans & Credit</h1>
-          <p className="text-xl text-gray-600 mb-12">
+          <h1 className="text-5xl font-bold mb-6 text-gray-900 dark:text-gray-100">Loans & Credit</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12">
             Flexible financing solutions to help you achieve your goals. From personal loans to mortgages, we offer competitive rates and terms.
           </p>
         </div>
       </section>
 
       {/* LOAN TYPES */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 dark:bg-gray-900 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">Loan Options</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -95,10 +95,10 @@ export default function LoansCredit() {
                 amount: "Up to 80% LTV"
               },
             ].map((loan, i) => (
-              <div key={i} className="bg-white border border-gray-100 p-8 rounded-3xl hover:border-blue-200 transition">
+              <div key={i} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 p-8 rounded-3xl hover:border-blue-200 dark:hover:border-blue-400 transition">
                 <loan.icon className="w-12 h-12 text-blue-600 mb-6" />
                 <h3 className="text-xl font-semibold mb-4">{loan.title}</h3>
-                <p className="text-gray-600 mb-6">{loan.desc}</p>
+                <p className="text-gray-600 dark:text-gray-300  mb-6">{loan.desc}</p>
                 <div className="space-y-2 text-sm">
                   <p><span className="font-semibold text-blue-600">{loan.rate}</span></p>
                   <p><span className="text-gray-500">Term:</span> {loan.term}</p>
@@ -111,7 +111,7 @@ export default function LoansCredit() {
       </section>
 
       {/* CREDIT CARDS */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">Credit Cards</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -135,10 +135,10 @@ export default function LoansCredit() {
                 apr: "13.99% - 23.99% APR"
               },
             ].map((card, i) => (
-              <div key={i} className="bg-gray-50 border border-gray-100 p-8 rounded-3xl hover:border-blue-200 transition">
+              <div key={i} className="bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-600 p-8 rounded-3xl hover:border-blue-200 dark:hover:border-blue-400 transition">
                 <CreditCard className="w-12 h-12 text-blue-600 mb-6" />
                 <h3 className="text-xl font-semibold mb-4">{card.title}</h3>
-                <p className="text-gray-600 mb-6">{card.desc}</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">{card.desc}</p>
                 <ul className="space-y-2 mb-6">
                   {card.features.map((feature, j) => (
                     <li key={j} className="flex items-center text-sm">
@@ -155,14 +155,14 @@ export default function LoansCredit() {
       </section>
 
       {/* LOAN CALCULATOR */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-white p-8 rounded-3xl shadow-sm">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm">
             <div className="flex items-center mb-8">
               <Calculator className="w-10 h-10 text-blue-600 mr-4" />
               <div>
                 <h2 className="text-3xl font-bold">Loan Calculator</h2>
-                <p className="text-gray-600">Estimate your monthly payments</p>
+                <p className="text-gray-600 dark:text-gray-300">Estimate your monthly payments</p>
               </div>
             </div>
 
@@ -173,7 +173,7 @@ export default function LoansCredit() {
                   <input
                     type="number"
                     placeholder="Enter amount"
-                    className="w-full border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -182,7 +182,7 @@ export default function LoansCredit() {
                     type="number"
                     step="0.01"
                     placeholder="6.99"
-                    className="w-full border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -190,7 +190,7 @@ export default function LoansCredit() {
                   <input
                     type="number"
                     placeholder="5"
-                    className="w-full border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <button className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-2xl font-semibold transition">
@@ -198,19 +198,19 @@ export default function LoansCredit() {
                 </button>
               </div>
 
-              <div className="bg-gray-50 p-6 rounded-2xl">
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl">
                 <h3 className="text-xl font-semibold mb-4">Estimated Results</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Monthly Payment:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Monthly Payment:</span>
                     <span className="font-semibold">$0.00</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Interest:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Total Interest:</span>
                     <span className="font-semibold">$0.00</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Total Amount:</span>
                     <span className="font-semibold">$0.00</span>
                   </div>
                 </div>
@@ -229,11 +229,11 @@ export default function LoansCredit() {
       {/* REGISTER MODAL */}
       {showRegister && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-100 p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl max-w-md w-full overflow-hidden">
             <div className="flex justify-between items-center border-b px-8 py-6">
               <div>
                 <h2 className="text-2xl font-bold">Open Your Account</h2>
-                <p className="text-sm text-gray-500">Step {registerStep} of 4</p>
+                <p className="text-sm text-gray-500 dark:text-gray-300">Step {registerStep} of 4</p>
               </div>
               <button onClick={() => {setShowRegister(false); setRegisterStep(1);}} className="text-3xl text-gray-400 hover:text-gray-600">
                 <X size={28} />
@@ -269,7 +269,7 @@ export default function LoansCredit() {
                   <p className="text-lg">Choose your account type</p>
                   <div className="grid grid-cols-2 gap-4">
                     <button className="border-2 border-blue-600 text-blue-700 py-6 rounded-2xl font-medium">Checking</button>
-                    <button className="border border-gray-300 py-6 rounded-2xl">Savings</button>
+                    <button className="border border-gray-300 dark:border-gray-600 py-6 rounded-2xl">Savings</button>
                   </div>
                 </div>
               )}

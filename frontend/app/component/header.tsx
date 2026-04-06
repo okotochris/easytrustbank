@@ -19,6 +19,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTheme } from './theme-provider';
 import { url } from 'inspector';
+import Logo from './logo';
 
 interface HeaderProps {
   onLoginClick?: () => void;
@@ -69,9 +70,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-linear-to-br from-blue-700 to-indigo-700 rounded-2xl flex items-center justify-center shadow-inner">
-              <Banknote className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-            </div>
+            <Logo />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-blue-950 dark:text-white tracking-tight">
                 EasyTrust Bank

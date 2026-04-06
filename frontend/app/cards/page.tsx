@@ -26,22 +26,22 @@ export default function Cards() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
       {/* HEADER */}
       <Header onLoginClick={() => setShowLogin(true)} onRegisterClick={() => setShowRegister(true)} />
 
       {/* HERO SECTION */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-bold mb-6 text-gray-900">Credit Cards</h1>
-          <p className="text-xl text-gray-600 mb-12">
+          <h1 className="text-5xl font-bold mb-6 text-gray-900 dark:text-white">Credit Cards</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12">
             Choose the perfect credit card for your lifestyle. From cash back rewards to travel benefits, we have options for everyone.
           </p>
         </div>
       </section>
 
       {/* FEATURED CARDS */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 dark:bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">Featured Cards</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -98,17 +98,17 @@ export default function Cards() {
                 bonus: "Get $250 back after spending $3,000 in business purchases"
               },
             ].map((card, i) => (
-              <div key={i} className="bg-white border border-gray-100 p-8 rounded-3xl hover:border-blue-200 transition shadow-sm">
+              <div key={i} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 p-8 rounded-3xl hover:border-blue-200 dark:hover:border-blue-400 transition shadow-sm">
                 {/* Card Visual */}
                 <div className={`w-full h-48 bg-gradient-to-br ${card.color} rounded-2xl mb-6 flex items-end p-6`}>
-                  <div className="text-white">
+                  <div className="text-white dark:text-gray-300">
                     <card.icon className="w-8 h-8 mb-2" />
                     <p className="text-sm opacity-90">{card.type}</p>
                   </div>
                 </div>
 
                 <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                <p className="text-gray-600 mb-6">{card.desc}</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">{card.desc}</p>
 
                 <div className="space-y-3 mb-6">
                   {card.features.slice(0, 3).map((feature, j) => (
@@ -140,7 +140,7 @@ export default function Cards() {
       </section>
 
       {/* CARD BENEFITS */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">Why Choose Our Cards?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -177,7 +177,7 @@ export default function Cards() {
       </section>
 
       {/* ADDITIONAL CARDS */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 dark:bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">More Card Options</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -195,9 +195,9 @@ export default function Cards() {
                 apr: "16.99% - 26.99% APR"
               },
             ].map((card, i) => (
-              <div key={i} className="bg-white border border-gray-100 p-8 rounded-3xl hover:border-blue-200 transition">
+              <div key={i} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-600 p-8 rounded-3xl hover:border-blue-200 dark:hover:border-blue-400 transition">
                 <h3 className="text-xl font-semibold mb-4">{card.title}</h3>
-                <p className="text-gray-600 mb-6">{card.desc}</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">{card.desc}</p>
 
                 <ul className="space-y-3 mb-6">
                   {card.features.map((feature, j) => (
@@ -221,10 +221,10 @@ export default function Cards() {
       </section>
 
       {/* APPLICATION PROCESS */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Easy Application Process</h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-12">
             Apply online in minutes and get a decision quickly. No hard credit pull for pre-qualification.
           </p>
 

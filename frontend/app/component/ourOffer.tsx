@@ -8,8 +8,10 @@ import {
   HandCoins, 
   Building2, 
   TrendingUp, 
-  Users 
+  Users, 
+
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Services() {
   const services = [
@@ -18,42 +20,48 @@ export default function Services() {
       description: "Secure your money with our high-yield savings and checking accounts designed for growth.",
       icon: PiggyBank,
       color: "blue",
-      bgColor: "from-blue-50 to-cyan-50"
+      bgColor: "from-blue-50 to-cyan-50",
+      url:'/deposit-accounts'
     },
     {
       title: "Credit Cards",
       description: "Find the perfect credit card for your lifestyle and spending habits with competitive rates.",
       icon: CreditCard,
       color: "purple",
-      bgColor: "from-purple-50 to-violet-50"
+      bgColor: "from-purple-50 to-violet-50",
+      url:'/cards'
     },
     {
       title: "Loans",
       description: "Get competitive rates on personal, auto, and home loans tailored to your financial goals.",
       icon: HandCoins,
       color: "emerald",
-      bgColor: "from-emerald-50 to-teal-50"
+      bgColor: "from-emerald-50 to-teal-50",
+      url:'/loans-credit'
     },
     {
       title: "Business Banking",
       description: "Comprehensive banking solutions designed to help your business thrive and grow.",
       icon: Building2,
       color: "amber",
-      bgColor: "from-amber-50 to-orange-50"
+      bgColor: "from-amber-50 to-orange-50",
+      url:'/business-banking'
     },
     {
       title: "Wealth & Retirement",
       description: "Plan for your future with our expert investment and retirement planning services.",
       icon: TrendingUp,
       color: "rose",
-      bgColor: "from-rose-50 to-pink-50"
+      bgColor: "from-rose-50 to-pink-50",
+      url:'/wealth-retirement'
     },
     {
       title: "About EasyTrust Bank",
       description: "Learn more about our commitment to exceptional banking services and community support.",
       icon: Users,
       color: "indigo",
-      bgColor: "from-indigo-50 to-blue-50"
+      bgColor: "from-indigo-50 to-blue-50",  
+      url:'/about'
     },
   ];
 
@@ -109,8 +117,11 @@ export default function Services() {
 
                 {/* Learn More */}
                 <div className="mt-10 flex items-center gap-2 text-blue-700 font-medium group-hover:gap-3 transition-all">
-                  Learn More 
+                  <Link href={service.url} className="flex items-center gap-1">
+                   Learn More 
                   <span className="text-xl transition-transform group-hover:translate-x-1">→</span>
+                  </Link>
+
                 </div>
               </div>
             );
