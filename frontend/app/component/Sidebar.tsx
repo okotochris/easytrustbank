@@ -191,13 +191,13 @@ export default function Sidebar({
 
         {/* Logout Button */}
         <div className="p-6 border-t border-gray-200 dark:border-zinc-800 mt-auto">
-          <Link 
-            href="/logout"
+          <button 
+           onClick={()=>{localStorage.clear; window.location.href="/login"}}
             className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-2xl transition-all"
           >
             <LogOut className="w-5 h-5" />
             Sign Out
-          </Link>
+          </button>
         </div>
       </div>
     </>

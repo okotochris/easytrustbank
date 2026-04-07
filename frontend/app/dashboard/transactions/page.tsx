@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   ArrowUpRight, 
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '../../component/Sidebar';
 import Header from '../../component/headerbar';
+import FancyLoader from '@/app/component/loading';
 
 interface Transaction {
   id: number;
@@ -27,59 +28,50 @@ export default function TransactionsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
   const [activeItem, setActiveItem] = useState<string>('Transactions');
-
-  const transactions: Transaction[] = [
-    {
-      id: 1,
-      type: 'credit',
-      amount: 1250.00,
-      status: 'Completed',
-      reference: 'TXN-987654321',
-      description: 'Salary Deposit',
-      date: 'April 3, 2026',
-      category: 'Income'
-    },
-    {
-      id: 2,
-      type: 'debit',
-      amount: 89.99,
-      status: 'Completed',
-      reference: 'TXN-987654320',
-      description: 'Netflix Subscription',
-      date: 'April 2, 2026',
-      category: 'Entertainment'
-    },
-    {
-      id: 3,
-      type: 'debit',
-      amount: 245.50,
-      status: 'Completed',
-      reference: 'TXN-987654319',
-      description: 'Whole Foods Market',
-      date: 'April 1, 2026',
-      category: 'Groceries'
-    },
-    {
-      id: 4,
-      type: 'credit',
-      amount: 320.00,
-      status: 'Pending',
-      reference: 'TXN-987654318',
-      description: 'Freelance Payment',
-      date: 'March 30, 2026',
-      category: 'Income'
-    },
-    {
-      id: 5,
-      type: 'debit',
-      amount: 12.99,
-      status: 'Failed',
-      reference: 'TXN-987654317',
-      description: 'Spotify Premium',
-      date: 'March 29, 2026',
-      category: 'Entertainment'
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  
+  useEffect(() => {
+      async function fetchTransactions() {
+        setLoading(true);
+      // Simulate API call to fetch transactions
+       try {
+          const userData = localStorage.getItem('user');
+          if (!userData) {
+            window.location.href = '/login';
+            return;
+          }
+          const user = JSON.parse(userData);
+          const email = user.email;
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history?email=${email}`);
+            if (response.ok) {
+              const data = await response.json();
+             setTransactions(data.history);
+              // setAccountStatementInfo(data.accountStatementInfo);
+            } else {
+              console.error('Failed to fetch user data');
+            }
+            setLoading(false);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          } 
+      }
+      fetchTransactions();
+  }, [])
+  
+  // const transactions: Transaction[] = [
+  //   {
+  //     id: 1,
+  //     type: 'credit',
+  //     amount: 1250.00,
+  //     status: 'Completed',
+  //     reference: 'TXN-987654321',
+  //     description: 'Salary Deposit',
+  //     date: 'April 3, 2026',
+  //     category: 'Income'
+  //   },
+    
+  // ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -220,6 +212,7 @@ export default function TransactionsPage() {
           </div>
         </main>
       </div>
+       {loading && <FancyLoader fullScreen message="fetching account details..." /> }
     </div>
   );
 }

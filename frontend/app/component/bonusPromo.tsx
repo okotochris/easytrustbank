@@ -3,12 +3,14 @@
 
 import React from 'react';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/dist/client/components/navigation';
 
 interface BonusPromoProps {
   onRegisterClick: () => void;
 }
 
 export default function BonusPromo({ onRegisterClick }: BonusPromoProps) {
+  const router = useRouter();
   return (
     <section className="py-20 bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-800 text-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
@@ -84,7 +86,7 @@ export default function BonusPromo({ onRegisterClick }: BonusPromoProps) {
 
             {/* CTA Button */}
             <button
-              onClick={onRegisterClick}
+              onClick={() => router.push('/register')}
               className="mt-8 group bg-white text-blue-950 hover:bg-yellow-300 hover:text-blue-950 px-10 py-5 rounded-3xl font-semibold text-xl flex items-center gap-3 transition-all duration-300 active:scale-95 shadow-xl"
             >
               Open Account Now & Claim $200

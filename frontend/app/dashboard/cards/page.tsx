@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   CreditCard, 
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '../../component/Sidebar';
 import Header from '../../component/headerbar';
+import FancyLoader from '@/app/component/loading';
 
 interface Card {
   id: number;
@@ -27,7 +28,14 @@ interface Card {
   balance: number;
   color: string;
 }
-
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+};
 export default function CardsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
@@ -35,32 +43,47 @@ export default function CardsPage() {
 
   const [showCvv, setShowCvv] = useState<{ [key: number]: boolean }>({});
   const [copied, setCopied] = useState<number | null>(null);
+  const [myCards, setMyCards] = useState<Card[]>([])
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
-  const myCards: Card[] = [
-    {
-      id: 1,
-      type: 'Physical',
-      cardNumber: '4242 4242 4242 4242',
-      expiry: '12/28',
-      cvv: '424',
-      cardholder: 'Alex Rivera',
-      status: 'Active',
-      balance: 3450.00,
-      color: 'from-blue-600 to-indigo-600'
-    },
-    {
-      id: 2,
-      type: 'Virtual',
-      cardNumber: '5353 5353 5353 5353',
-      expiry: '09/27',
-      cvv: '535',
-      cardholder: 'Alex Rivera',
-      status: 'Active',
-      balance: 1200.00,
-      color: 'from-violet-600 to-purple-600'
-    }
-  ];
+  // const myCards: Card[] = [
+  //   {
+  //     id: 2,
+  //     type: 'Virtual',
+  //     cardNumber: '5353 5353 5353 5353',
+  //     expiry: '09/27',
+  //     cvv: '535',
+  //     cardholder: 'Alex Rivera',
+  //     status: 'Active',
+  //     balance: 1200.00,
+  //     color: 'from-violet-600 to-purple-600'
+  //   }
+  // ];
+    useEffect(()=>{
+     async function fetchCards() {
+      setIsLoading(true);
+      const userData = localStorage.getItem('user');
+      if (!userData) {
+        console.error('No user data found in localStorage');
+        setIsLoading(false);
+        return;
+      }
+      setUser(JSON.parse(userData));
+      const email = JSON.parse(userData).email;
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?email=${email}`);
+          const data = await response.json();
+          setMyCards(data);
 
+        } catch (error) {
+          console.error('Error fetching cards:', error);
+        }finally{
+          setIsLoading(false);
+        }
+      }
+      fetchCards(); 
+    },[])
   const activeCardsCount = myCards.filter(card => card.status === 'Active').length;
   const pendingApplications = 0;
   const totalBalance = myCards.reduce((sum, card) => sum + card.balance, 0);
@@ -157,7 +180,7 @@ export default function CardsPage() {
                 {myCards.map((card) => (
                   <div
                     key={card.id}
-                    className={`bg-gradient-to-br ${card.color} text-white rounded-3xl p-8 shadow-xl relative overflow-hidden`}
+                    className={`bg-gradient-to-br ${`from-violet-600 to-purple-600`} text-white rounded-3xl p-8 shadow-xl relative overflow-hidden`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -172,7 +195,7 @@ export default function CardsPage() {
                     <div className="mt-10 flex justify-between items-end">
                       <div>
                         <p className="text-xs opacity-70">CARDHOLDER</p>
-                        <p className="font-medium">{card.cardholder}</p>
+                        <p className="font-medium">{user?.firstName}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xs opacity-70">VALID THRU</p>
@@ -206,13 +229,13 @@ export default function CardsPage() {
                     </div>
 
                     <div className="absolute top-6 right-6 px-4 py-1 bg-white/20 text-xs font-medium rounded-full">
-                      {card.status}
+                      Active
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-white/20 flex justify-between text-sm">
                       <div>
                         <p className="opacity-70">Balance</p>
-                        <p className="font-semibold">${card.balance.toLocaleString()}</p>
+                        <p className="font-semibold">${user?.balance?.toLocaleString()}</p>
                       </div>
                       <button className="text-white/90 hover:text-white underline text-sm">
                         Freeze Card
@@ -313,6 +336,7 @@ export default function CardsPage() {
           </div>
         </div>
       )}
+      {isLoading && <FancyLoader fullScreen message="fetching cards details..." /> }
     </div>
   );
 }

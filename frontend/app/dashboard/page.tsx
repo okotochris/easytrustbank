@@ -1,32 +1,102 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Sidebar from '../component/Sidebar';
 import Header from '../component/headerbar';
 import { ArrowUpRight, ArrowDownRight, Receipt, UserPlus, Building2, Send, PiggyBank, CreditCard, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import FancyLoader from '../component/loading';
+import { url } from 'inspector';
 
+type Transaction = {
+  id: number;
+  type: 'credit' | 'debit';
+  amount: number;
+  description: string;
+  date: string;
+  category: string;
+};
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+};
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
   const [activeItem, setActiveItem] = useState<string>('Overview');
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  //const [accountStatementInfo, setAccountStatementInfo] = useState<AccountStatementInfo[]>([]);
+  const router = useRouter()
+  useEffect(() => {
+      async function getUserData() {
+       const userData = localStorage.getItem('user');
+       if (userData) {
+          const user = JSON.parse(userData);
+          setUser(user);
+          try {
+            setIsLoading(true);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?email=${user.email}`);
+            if (response.ok) {
+              const data = await response.json();
+              setRecentTransactions(data.history);
+              // setAccountStatementInfo(data.accountStatementInfo);
+            } else {
+              console.error('Failed to fetch user data');
+            }
+            setIsLoading(false);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          } 
+         console.log('User data from localStorage:', user);
+       } else {
+        router.push('/login')
+       }
+      }
+       getUserData()
+  }, []);
 
-  const balance = 12487.65;
-  const savings = 8750.00;
-  const creditAvailable = 3450.00;
+//TOTAL transaction
+function sumAmounts(amounts: number[]): number {
+  return amounts.reduce((total, amount) => total + amount, 0);
+}
+//This month transaction
+function sumThisMonth(
+  transactions: { amount: number; date: string | Date }[]
+): number {
+  const now = new Date();
 
-  const recentTransactions = [
-    { id: 1, type: 'credit', amount: 1250.00, description: 'Salary Deposit', date: 'April 3, 2026', category: 'Income' },
-    { id: 2, type: 'debit', amount: 89.99, description: 'Netflix Subscription', date: 'April 2, 2026', category: 'Entertainment' },
-    { id: 3, type: 'debit', amount: 245.50, description: 'Whole Foods Market', date: 'April 1, 2026', category: 'Groceries' },
-    { id: 4, type: 'credit', amount: 320.00, description: 'Freelance Payment', date: 'March 30, 2026', category: 'Income' },
-  ];
+  return transactions.reduce((total, tx) => {
+    const txDate = new Date(tx.date);
 
+    const isSameMonth =
+      txDate.getMonth() === now.getMonth() &&
+      txDate.getFullYear() === now.getFullYear();
+
+    return isSameMonth ? total + tx.amount : total;
+  }, 0);
+}
+//Encrypt acccount number 
+function maskAccountNumber(accountNumber: string | number): string {
+  const str = accountNumber.toString();
+  const last4 = str.slice(-4);
+  return '********' + last4;
+}
+  const monthlyDeposits = sumThisMonth(recentTransactions.filter(tx => tx.type === 'credit'));
+  const monthlyExpenses = sumThisMonth(recentTransactions.filter(tx => tx.type === 'debit'));
+  const accountNumber = user ? maskAccountNumber(user.accountNumber) : '';
   const accountStatementInfo = [
-    { id: 1, icon: CreditCard, title: 'Available', amount: 500000.00, footer: 'Account Limit' },
-    { id: 2, icon: Send, title: 'This Month', amount: 0.00, footer: 'Monthly Deposits' },
-    { id: 3, icon: PiggyBank, title: 'This Month', amount: 0.00, footer: 'Monthly Expenses' },
-    { id: 4, icon: CreditCard, title: 'All Time', amount: 0.00, footer: 'Total Volume' },
+    { id: 1, icon: CreditCard, title: 'Available', amount: user?.balance, footer: 'Account Limit' },
+    { id: 2, icon: Send, title: 'This Month', amount: monthlyDeposits, footer: 'Monthly Deposits' },
+    { id: 3, icon: PiggyBank, title: 'This Month', amount: monthlyExpenses, footer: 'Monthly Expenses' },
+    { id: 4, icon: CreditCard, title: 'All Time', amount: sumAmounts(recentTransactions.map(t => t.amount)), footer: 'Total Volume' },
   ];
 
   return (
@@ -47,7 +117,8 @@ export default function Dashboard() {
           
           {/* Account Statement Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {accountStatementInfo.map((info) => {
+            {accountStatementInfo ?
+              accountStatementInfo.map((info) => {
               const Icon = info.icon;
               return (
                 <div 
@@ -60,13 +131,15 @@ export default function Dashboard() {
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">{info.title}</p>
                     <p className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-                      ${info.amount.toLocaleString()}
+                      ${info.amount?.toLocaleString()}
                     </p>
                     <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">{info.footer}</p> 
                   </div>
                 </div>
               );
-            })}
+            }) :
+              <p className="text-center text-gray-500 dark:text-gray-400 col-span-full py-10">No account statement info available.</p>  
+              }
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
@@ -84,7 +157,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-10 relative z-10">
                   <div className="flex items-center gap-4">
                     <img 
-                      src="/easytrust-logo-white.png" 
+                      src="/logo.png" 
                       alt="EasyTrust Bank" 
                       className="w-11 h-11 drop-shadow-md" 
                     />
@@ -96,7 +169,7 @@ export default function Dashboard() {
 
                   <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl text-center border border-white/20">
                     <p className="text-xs text-blue-200 tracking-widest">ACCOUNT NUMBER</p>
-                    <p className="font-mono font-medium">••••••••8978</p>
+                    <p className="font-mono font-medium">{accountNumber}</p>
                   </div>
                 </div>
 
@@ -106,7 +179,7 @@ export default function Dashboard() {
                   <div className="flex w-full md:w-auto ">
                     <div className="flex flex-col gap-1">
                       <p className="text-blue-200 text-sm">Account Holder</p>
-                      <h2 className="text-lg font-semibold">Okoto..</h2>
+                      <h2 className="text-lg font-semibold">{user?.firstName}</h2>
                       <div className="flex items-center gap-2 mt-2">
                         <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
                         <span className="text-emerald-300 text-sm font-medium">Active</span>
@@ -116,7 +189,7 @@ export default function Dashboard() {
 
                     <div className="flex flex-col gap-1">
                       <p className="text-blue-200 text-sm">Fiat Balance</p>
-                      <h2 className="text-lg font-semibold font-mono tracking-tighter">${balance.toLocaleString()}</h2>
+                      <h2 className="text-lg font-semibold font-mono tracking-tighter">${user?.balance?.toLocaleString() || "0.00"}</h2>
                       <span className="text-blue-200 text-sm">USD Balance</span>
                     </div>
                   </div>
@@ -149,10 +222,10 @@ export default function Dashboard() {
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { icon: Send, name: "Transfer", color: "blue" },
-                    { icon: Receipt, name: "Pay Bill", color: "emerald" },
-                    { icon: UserPlus, name: "Request Money", color: "amber" },
-                    { icon: Building2, name: "Bank Details", color: "violet" },
+                    { icon: Send, name: "Transfer", color: "blue", url: "/dashboard/transfers/local" },
+                    { icon: Receipt, name: "Pay Bill", color: "emerald", url: "/dashboard/bills" },
+                    { icon: UserPlus, name: "Request Money", color: "amber", url: "/dashboard/requests" },
+                    { icon: Building2, name: "Bank Details", color: "violet", url: "/dashboard/settings" },
                   ].map((action, index) => {
                     const Icon = action.icon;
                     return (
@@ -181,7 +254,7 @@ export default function Dashboard() {
                   <div>
                     <p className="text-gray-500 dark:text-gray-400">Credit Card</p>
                     <p className="text-4xl font-bold mt-6 text-gray-900 dark:text-white">
-                      ${creditAvailable}
+                      ${user?.balance?.toLocaleString() || "0.00"}
                     </p>
                     <p className="text-emerald-600 dark:text-emerald-400 mt-2 text-sm">Available Credit</p>
                   </div>
@@ -215,7 +288,8 @@ export default function Dashboard() {
               </div>
 
               <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm divide-y divide-gray-100 dark:divide-zinc-800">
-                {recentTransactions.map((tx) => (
+                {recentTransactions ? 
+                recentTransactions.map((tx) => (
                   <div key={tx.id} className="px-6 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center
@@ -231,12 +305,15 @@ export default function Dashboard() {
                       {tx.type === 'credit' ? '+' : '-'}${tx.amount.toFixed(2)}
                     </p>
                   </div>
-                ))}
+                )):
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No recent transactions found.</p>  
+              }
               </div>
             </div>
           </div>
         </div>
       </div>
+       {isLoading && <FancyLoader fullScreen message="fetching account details..." /> }
     </div>
   );
 }

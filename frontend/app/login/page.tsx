@@ -2,10 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Lock, Shield, ArrowLeft, ArrowRight, Moon, Sun, Check } from 'lucide-react';
+import { Mail, Lock, Shield, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
-import Header from '../component/header';
 import Footer from '../component/footer';
+import FancyLoader from '../component/loading';
+import { useRouter } from 'next/navigation';
+
 
 interface LoginFormData {
   email: string;
@@ -23,7 +25,7 @@ export default function Login() {
     email: '',
     password: ''
   });
-
+  const router = useRouter();
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -71,18 +73,30 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+    
     setIsLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      }); 
+      const data = await res.json();
 
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        alert('✅ Welcome back to EasyTrust Bank! (Demo mode)');
-        window.location.href = '/';
-      } else {
-        setErrors({ general: 'Invalid credentials. Please try again.' });
+      if (!res.ok) {
+        setErrors({ general: data.message || 'Login failed' });
+        return;
       }
+      // On successful login, you can store the token and redirect
+      const { user } = data;
+      console.log(user);
+      localStorage.setItem('user', JSON.stringify(user));
+      router.push('/login/verify-pin'); // Redirect to PIN verification
+    } catch (error) {
+      setErrors({ general: 'An error occurred. Please try again.' });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -209,7 +223,7 @@ export default function Login() {
             <div className="mt-8 text-center">
               <p className="text-gray-600 dark:text-gray-400">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
                   Create one here
                 </Link>
               </p>
@@ -219,6 +233,7 @@ export default function Login() {
       </div>
 
       <Footer />
+      {isLoading && <FancyLoader fullScreen message="Signing in..." /> }
     </div>
   );
 }

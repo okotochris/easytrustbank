@@ -23,23 +23,24 @@ mongoose.connect(mongoseString)
 app.use(cors());
 app.use(express.json());
 
+
+
 function generateAccountNumber() {
-  const randomDigits = crypto.randomBytes(5).toString('hex').slice(0, 10);
-  return  randomDigits;
+  return crypto.randomInt(1000000000, 9999999999).toString(); // 10-digit number
 }
+
 function generateVerificationCode() {
-  const randomDigits = crypto.randomBytes(3).toString('hex').slice(0, 6);
-  return randomDigits;
+  return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
 app.post('/api/signup', async (req, res) => {
   try {
-    const { fname, lname, email, phone, pin, password } = req.body;
+    const { firstName, lastName, email, phone, password } = req.body;
     console.log(req.body);
     // Your signup logic here
     const code = generateVerificationCode();
     const newUser = new IsVerify({
-      data: { fname, lname, email, phone, pin, password },
+      data: { firstName, lastName, email, phone, password },
       email,
       code
     });
@@ -61,40 +62,83 @@ app.post('/api/signup', async (req, res) => {
 
 //Verify code from email
 app.post('/api/verify', async (req, res) => {
+  console.log(req.body)
   try {
     const { email, code } = req.body;
     const verificationRecord = await IsVerify.findOne({ email, code });
     if (!verificationRecord) {
       return res.status(400).json({ message: 'Invalid verification code' });
     }
-    const { fname, lname, phone, pin, password } = verificationRecord.data;
+    const accountNum = generateAccountNumber();
+    const { firstName, lastName, address, password, country, currency, accountType, phone } = verificationRecord.data;
     const hashedPassword = await bcrypt.hash(password, 10);
     const accountNumber = generateAccountNumber();
     const newUser = new User({  
-        fname,
-        lname,
+        firstName,
+        lastName,
+        address,
+        country,
+        currency,
+        accountType,
         email,
         phone,
-        pin,
         password: hashedPassword,
-        accountNumber
+        accountNumber:accountNum 
     });
     await newUser.save();
-    const user = { fname, lname, email, phone, accountNumber };
+    const user = { firstName, lastName, email, phone, accountNumber };
     await IsVerify.deleteOne({ email });
-    res.status(200).json({ message: 'Account verified and created successfully', user });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//UPDATE PIN
+app.post('/api/set-pin', async (req, res) => {
+  try {
+    const { email, pin } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.pin = pin;
+    await user.save();
+    res.status(200).json({ message: 'PIN set successfully' });
+  }
+    catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+//VERIFY PIN
+app.post('/api/verify-pin', async (req, res) => {
+  try {
+    const { email, pin } = req.body;
+    console.log(req.body)
+    const user = await User.findOne({ email }); 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.pin !== pin) {
+      return res.status(400).json({ message: 'Invalid PIN' });
+    }
+    res.status(200).json({ message: 'PIN verified successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
+
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log(req.body)
     // Your login logic here
     const user = await User.findOne({ email });
+    console.log(user)
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });    
     }
@@ -110,9 +154,10 @@ app.post('/api/login', async (req, res) => {
 });
 app.get('/api/history', async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { email } = req.query;
+    console.log(email)
     // Your history retrieval logic here
-    const history = await History.find({ userId }).sort({ timestamp: -1 });
+    const history = await History.find({ email }).sort({ timestamp: -1 });
     res.status(200).json({ history });
     } catch (error) {
     console.error(error);
@@ -154,6 +199,22 @@ app.post('/api/add-card', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+app.get('/api/cards', async (req, res) => {
+  console.log('Cards query:', req.query);
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const cards = user.atmCards;
+    res.status(200).json(cards);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+
+  }
+});
 
 app.post('/api/update-profile', async (req, res) => {
   try {
@@ -175,4 +236,11 @@ app.post('/api/update-profile', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  // User.deleteMany({})
+  // .then(result=>{
+  //   console.log("Deleted all verification records")
+  // })
+  // .catch(err=>{
+  //   console.log(err)
+  // })
 });

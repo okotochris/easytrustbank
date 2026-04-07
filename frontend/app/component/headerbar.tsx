@@ -11,7 +11,14 @@ import {
   LogOut 
 } from 'lucide-react';
 import Link from 'next/link';
-
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+};
 interface HeaderProps {
   onMenuClick: () => void;
 }
@@ -19,14 +26,18 @@ interface HeaderProps {
 export default function Header({ onMenuClick }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    async function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
-
+    const userData = localStorage.getItem('user'); 
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -46,7 +57,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
           <div>
             <h2 className='text-xl'>Dashboard</h2>
-            <p>Welcome back, Chris</p>
+            <p>Welcome back, {user?.firstName}!</p>
           </div>
         </div>
 
@@ -68,9 +79,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <div className="w-9 h-9 bg-linear-to-br from-blue-500 to-indigo-500 rounded-2xl"></div>
 
               <div className="hidden sm:block text-left">
-                <p className="font-medium text-sm">Chris Okoto</p>
+                <p className="font-medium text-sm">{user?.firstName} {user?.lastName}</p>
                 <p className="text-xs text-gray-500 -mt-0.5">
-                  okoto.chris.oc@gmail.com
+                  {user?.email}
                 </p>
               </div>
 
@@ -103,7 +114,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <div className="border-t border-gray-200 dark:border-zinc-800 my-2"></div>
 
                 {/* Logout */}
-                <button className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition">
+                <button 
+                  onClick={() => (window.location.href = "/login")}
+                  className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition">
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
                 </button>

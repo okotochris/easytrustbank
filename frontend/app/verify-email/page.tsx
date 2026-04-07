@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from "react";
+import FancyLoader from "../component/loading";
 
 export default function VerifyPage() {
   const length = 5;
   const [values, setValues] = useState<string[]>(Array(length).fill(""));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
 
   useEffect(() => {
@@ -49,7 +51,9 @@ export default function VerifyPage() {
       }
     }
   };
-  async function handleSubmit() {
+  async function handleSubmit(e: React.FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setIsLoading(true);
     try{
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verify`, {
         method: 'POST',
@@ -63,14 +67,13 @@ export default function VerifyPage() {
       }
         const data = await res.json()
         localStorage.setItem('user', JSON.stringify(data))
-        window.location.href = '/dashboard';
+        window.location.href = '/verify-email/set_pin';
+         setIsLoading(false);
     }
     catch(err){
       console.log(err)
     }
-    finally{
-
-    }
+    
   }
 
   
@@ -109,9 +112,8 @@ export default function VerifyPage() {
 
         {/* Verify Button */}
         <button
-          onClick={() => {
-            const code = values.join("");
-            console.log("Manual submit:", code);
+          onClick={(e) => {
+           handleSubmit(e);
           }}
           className="mt-6 w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition"
         >
@@ -126,6 +128,9 @@ export default function VerifyPage() {
           </span>
         </p>
       </div>
+      {
+        isLoading && <FancyLoader fullScreen message="Verifying code...." /> 
+      } 
     </div>
   );
 }

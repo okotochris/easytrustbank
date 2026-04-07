@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Check, User, Phone, CreditCard, Lock, ArrowRight, DollarSign, Globe, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import LoadingIndicator from '../component/loading';
+import FancyLoader from '../component/loading';
 
 const currencies = [
   { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
@@ -20,6 +21,7 @@ const currencies = [
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const totalSteps = 4;
 
   const [formData, setFormData] = useState({
@@ -71,8 +73,10 @@ export default function RegisterPage() {
   };
  async function handleSubmit() {
     // Here you would normally send formData to your backend API
+    
+    setIsLoading(true);
     try{
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -84,12 +88,12 @@ export default function RegisterPage() {
       }
       localStorage.setItem('email', formData.email);
       window.location.href = '/verify-email';
-
+      setIsLoading(false);
     }
     catch(error){
         console.error("Error creating account:", error);
     }
-    finally{}
+    
   }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 transition-colors duration-300">
@@ -358,7 +362,9 @@ export default function RegisterPage() {
           <p>&copy; 2026 EasyTrust Bank. All rights reserved.</p>
         </div>
       </footer>
-      <LoadingIndicator message="Processing your transfer..." />
+      {
+        isLoading && <FancyLoader fullScreen message="Signing up..." /> 
+      } 
     </div>
   );
 }
