@@ -16,6 +16,7 @@ type Transaction = {
   description: string;
   date: string;
   category: string;
+  title:string
 };
 
 type User = {
@@ -40,13 +41,15 @@ export default function Dashboard() {
        const userData = localStorage.getItem('user');
        if (userData) {
           const user = JSON.parse(userData);
-          setUser(user);
+          
           try {
             setIsLoading(true);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?email=${user.email}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history?email=${user.email}`);
             if (response.ok) {
               const data = await response.json();
               setRecentTransactions(data.history);
+              setUser(data.user);
+              console.log(data)
               // setAccountStatementInfo(data.accountStatementInfo);
             } else {
               console.error('Failed to fetch user data');
@@ -55,7 +58,7 @@ export default function Dashboard() {
           } catch (error) {
             console.error('Error fetching user data:', error);
           } 
-         console.log('User data from localStorage:', user);
+        
        } else {
         router.push('/login')
        }
@@ -65,6 +68,9 @@ export default function Dashboard() {
 
 //TOTAL transaction
 function sumAmounts(amounts: number[]): number {
+  if(!sumAmounts){
+    return 0
+  }
   return amounts.reduce((total, amount) => total + amount, 0);
 }
 //This month transaction
@@ -89,14 +95,21 @@ function maskAccountNumber(accountNumber: string | number): string {
   const last4 = str.slice(-4);
   return '********' + last4;
 }
-  const monthlyDeposits = sumThisMonth(recentTransactions.filter(tx => tx.type === 'credit'));
-  const monthlyExpenses = sumThisMonth(recentTransactions.filter(tx => tx.type === 'debit'));
+  let monthlyDeposits = 0
+  let monthlyExpenses = 0
+  let totalVolume = 0
+  if(recentTransactions){
+    monthlyDeposits = sumThisMonth(recentTransactions.filter(tx => tx.type === 'credit'));
+    monthlyExpenses = sumThisMonth(recentTransactions.filter(tx => tx.type === 'debit'));
+    totalVolume = sumAmounts(recentTransactions.map(tx => tx.amount));
+  } 
+
   const accountNumber = user ? maskAccountNumber(user.accountNumber) : '';
   const accountStatementInfo = [
     { id: 1, icon: CreditCard, title: 'Available', amount: user?.balance, footer: 'Account Limit' },
     { id: 2, icon: Send, title: 'This Month', amount: monthlyDeposits, footer: 'Monthly Deposits' },
     { id: 3, icon: PiggyBank, title: 'This Month', amount: monthlyExpenses, footer: 'Monthly Expenses' },
-    { id: 4, icon: CreditCard, title: 'All Time', amount: sumAmounts(recentTransactions.map(t => t.amount)), footer: 'Total Volume' },
+    { id: 4, icon: CreditCard, title: 'All Time', amount: totalVolume, footer: 'Total Volume' },
   ];
 
   return (
@@ -298,7 +311,7 @@ function maskAccountNumber(accountNumber: string | number): string {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">{tx.description}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tx.category} • {tx.date}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tx.title} • {new Date(tx.date).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <p className={`font-semibold text-lg ${tx.type === 'credit' ? 'text-emerald-600' : 'text-red-600'}`}>

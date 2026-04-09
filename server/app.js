@@ -10,6 +10,7 @@ const History = require('./schema/history');
 const IsVerify = require('./schema/isVerify');  
 const axios = require('axios');
 const bcrypt = require('bcrypt');
+const sendOTP = require('./email/resend')
 
 const mongoseString = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mydb'
 mongoose.connect(mongoseString)
@@ -35,28 +36,46 @@ function generateVerificationCode() {
 
 app.post('/api/signup', async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, password } = req.body;
+    const { firstName, lastName, address, password, country, currency, accountType, phone, email } = req.body;
     console.log(req.body);
     // Your signup logic here
     const code = generateVerificationCode();
-    const newUser = new IsVerify({
-      data: { firstName, lastName, email, phone, password },
-      email,
-      code
+
+    // const newUser = new IsVerify({
+    //   data: { firstName, lastName, email, phone, password },
+    //   email,
+    //   code
+    // })
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const accountNumberValue = generateAccountNumber();
+       const newUser = new User({  
+        firstName,
+        lastName,
+        address,
+        country,
+        currency,
+        accountType,
+        email,
+        phone,
+        password: hashedPassword,
+        accountNumber:accountNumberValue
     });
-    await axios.post(
-          "https://studynest.com.ng/send-otp",
-          {
-            userEmail: email,
-            companyName: "easytrustbank", // your current app name
-            userCode: code
-          }
-        );
-    await newUser.save();
-    res.status(200).json({ message: 'Verification code sent to email' });
+     await newUser.save();
+    // await axios.post(
+    //       "https://studynest.com.ng/send-otp",
+    //       {
+    //         userEmail: email,
+    //         companyName: "easytrustbank", // your current app name
+    //         userCode: code
+    //       }
+    //     );
+    // sendOTP(email, code)
+    //await newUser.save();
+    const user = { firstName, lastName, email, phone, accountNumberValue };
+    res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error'});
   }
 });
 
@@ -132,11 +151,22 @@ app.post('/api/verify-pin', async (req, res) => {
 });
 
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@easytrustbank.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AdminPass123!';
+const ADMIN_TOKENS = new Map();
+
+function verifyAdminToken(req, res, next) {
+  const token = req.headers['x-admin-token'] || req.body.adminToken || req.query.adminToken;
+  if (!token || !ADMIN_TOKENS.has(token)) {
+    return res.status(401).json({ message: 'Admin authorization required' });
+  }
+  next();
+}
+
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(req.body)
-    // Your login logic here
     const user = await User.findOne({ email });
     console.log(user)
     if (!user) {
@@ -152,13 +182,144 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      return res.status(401).json({ message: 'Invalid admin credentials' });
+    }
+    const token = crypto.randomBytes(24).toString('hex');
+    ADMIN_TOKENS.set(token, { email, createdAt: Date.now() });
+    res.status(200).json({ message: 'Admin login successful', token, admin: { email } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/api/admin/all-users', async (req, res) => {
+  console.log('visited')
+  try {
+    const users = await User.find().select('-password');
+    console.log(users)
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+});
+
+app.get('/api/admin/user', async (req, res) => {
+  try {
+    const { email} = req.query;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json( user );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/api/admin/transaction', async (req, res) => {
+  try {
+    const {
+      userAccountNumber,
+      username,
+      amount,
+      type,
+      title,
+      description,
+      status,
+      date,
+      time,
+      bank
+    } = req.body;
+
+    const numericAmount = Number(amount);
+
+    // Validation
+    if (!['credit', 'debit'].includes(type)) {
+      return res.status(400).json({ message: 'Invalid transaction type' });
+    }
+
+    if (numericAmount <= 0) {
+      return res.status(400).json({ message: 'Amount must be positive' });
+    }
+
+    // Update user balance
+    const user = await User.findOneAndUpdate(
+      { accountNumber: userAccountNumber },
+      { $inc: { balance: type === 'debit' ? -numericAmount : numericAmount } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Save transaction history
+   const historyEntry = new History({
+      date: date ? new Date(date) : new Date(),
+      description: description || (type === 'credit' ? 'Admin deposit' : 'Admin withdrawal'),
+      amount: numericAmount,
+      userAccountNumber,
+      username,
+      type,
+      title,
+      time: time || new Date().toLocaleTimeString('en-US', { hour12: false }),
+      status,
+
+  // ✅ ADD THESE
+  email: user.email,
+  bank // or whatever field name you used
+});
+
+    await historyEntry.save();
+
+    res.status(200).json({
+      message: 'Admin transaction completed',
+      user,
+      history: historyEntry
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/api/admin/card', async (req, res) => {
+  try {
+    const { targetEmail, targetAccountNumber, cardType, cardNumber, expiryDate, cvv } = req.body;
+    const search = {};
+    if (targetEmail) search.email = targetEmail;
+    if (targetAccountNumber) search.accountNumber = targetAccountNumber;
+    const user = await User.findOne(search);
+    if (!user) {
+      return res.status(404).json({ message: 'Target user not found' });
+    }
+    user.atmCards.push({ cardType, cardNumber, expiryDate, cvv });
+    await user.save();
+    res.status(200).json({ message: 'Card added successfully', cards: user.atmCards });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.get('/api/history', async (req, res) => {
   try {
     const { email } = req.query;
     console.log(email)
-    // Your history retrieval logic here
     const history = await History.find({ email }).sort({ timestamp: -1 });
-    res.status(200).json({ history });
+    const user = await User.findOne({ email }); 
+    res.status(200).json({history, user} );
+    console.log(history)
     } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -166,18 +327,51 @@ app.get('/api/history', async (req, res) => {
 });
 app.post('/api/history', async (req, res) => {
   try {
-    const { userId, date, description, amount, userAccountNumber, username, time } = req.body;
-    const newHistory = new History({
+    const {
       userId,
+      email,
       date,
       description,
       amount,
       userAccountNumber,
       username,
-      time
+      time,
+      type,
+      title,
+      status
+    } = req.body;
+
+    let historyEmail = email;
+    let historyUsername = username;
+    let historyAccountNumber = userAccountNumber;
+
+    if (userId && (!historyEmail || !historyAccountNumber || !historyUsername)) {
+      const targetUser = await User.findById(userId);
+      if (targetUser) {
+        historyEmail = targetUser.email;
+        historyAccountNumber = targetUser.accountNumber;
+        historyUsername = `${targetUser.firstName} ${targetUser.lastName}`;
+      }
+    }
+
+    if (!historyEmail || !historyAccountNumber || !historyUsername) {
+      return res.status(400).json({ message: 'Missing required history entry details' });
+    }
+
+    const newHistory = new History({
+      email: historyEmail,
+      date: date ? new Date(date) : new Date(),
+      description: description || 'Manual transaction entry',
+      amount,
+      userAccountNumber: historyAccountNumber,
+      username: historyUsername,
+      time: time || new Date().toLocaleTimeString('en-US', { hour12: false }),
+      type: type || (amount >= 0 ? 'credit' : 'debit'),
+      title: title || 'Manual Entry',
+      status: status || 'Completed'
     });
     await newHistory.save();
-    res.status(200).json({ message: 'History entry created successfully' });
+    res.status(200).json({ message: 'History entry created successfully', history: newHistory });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -215,7 +409,22 @@ app.get('/api/cards', async (req, res) => {
 
   }
 });
-
+app.get('/api/history', async (req, res) => {
+  console.log('History query:', req.query);
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const history = await History.find({ email }).sort({ timestamp: -1 });
+    console.log(history)
+    res.status(200).json(history );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' }); 
+  }
+});
 app.post('/api/update-profile', async (req, res) => {
   try {
     const { userId, fname, lname, phone, photo } = req.body;
@@ -236,7 +445,7 @@ app.post('/api/update-profile', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  // User.deleteMany({})
+  // IsVerify.deleteMany({})
   // .then(result=>{
   //   console.log("Deleted all verification records")
   // })

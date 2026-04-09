@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+
 import { 
   CreditCard, 
   Plus, 
@@ -35,6 +35,7 @@ type User = {
   phone: string;
   accountNumber: string;
   balance: number;
+  atmCards:Card[];
 };
 export default function CardsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -73,6 +74,9 @@ export default function CardsPage() {
       const email = JSON.parse(userData).email;
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?email=${email}`);
+          const responseUser = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user?email=${email}`);
+          const userData = await responseUser.json();
+          setUser(userData);
           const data = await response.json();
           setMyCards(data);
 
@@ -128,7 +132,7 @@ export default function CardsPage() {
                 </div>
                 <div>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">Active Cards</p>
-                  <p className="text-4xl font-semibold mt-1 text-gray-900 dark:text-white">{activeCardsCount}</p>
+                  <p className="text-4xl font-semibold mt-1 text-gray-900 dark:text-white">{user?.atmCards ? user?.atmCards.length : 0}</p>
                 </div>
               </div>
 
@@ -149,7 +153,7 @@ export default function CardsPage() {
                 <div>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">Total Balance</p>
                   <p className="text-4xl font-semibold mt-1 text-gray-900 dark:text-white">
-                    ${totalBalance.toLocaleString()}
+                    ${user?.balance?.toLocaleString() || '0.00'}
                   </p>
                   <p className="text-emerald-600 dark:text-emerald-400 text-sm mt-1 flex items-center gap-1">
                     <ArrowUpRight className="w-4 h-4" /> Across all cards

@@ -87,7 +87,10 @@ export default function RegisterPage() {
         throw new Error("Error creating account");
       }
       localStorage.setItem('email', formData.email);
-      window.location.href = '/verify-email';
+      const data = await response.json();
+      localStorage.setItem('user',  JSON.stringify(data));
+      window.location.href = '/verifying-email';
+      // window.location.href = '/verify-email';
       setIsLoading(false);
     }
     catch(error){

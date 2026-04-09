@@ -6,6 +6,7 @@ const historySchema = new mongoose.Schema({
     amount: { type: Number, required: true },
     userAccountNumber: { type: String, required: true },
     username: { type: String, required: true },
+    bank: { type: String, required: true },
     type: { type: String, required: true },
     title: { type: String, required: true },
     time: { type: String, required: true },

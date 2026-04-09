@@ -18,10 +18,11 @@ interface Transaction {
   type: 'credit' | 'debit';
   amount: number;
   status: 'Completed' | 'Pending' | 'Failed';
-  reference: string;
+  username: string;
   description: string;
   date: string;
   category: string;
+  
 }
 
 export default function TransactionsPage() {
@@ -139,7 +140,7 @@ export default function TransactionsPage() {
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Amount</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Type</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Status</th>
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Reference</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-50">Name</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Description</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Date</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Action</th>
@@ -175,7 +176,7 @@ export default function TransactionsPage() {
                           </span>
                         </td>
 
-                        <td className="px-6 py-5 font-mono text-sm text-gray-500 dark:text-gray-400">{tx.reference}</td>
+                        <td className="px-6 py-5 font-mono text-sm text-gray-500 dark:text-gray-400">{tx.username}</td>
 
                         <td className="px-6 py-5">
                           <div>
@@ -184,7 +185,7 @@ export default function TransactionsPage() {
                           </div>
                         </td>
 
-                        <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-400">{tx.date}</td>
+                        <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-400">{new Date(tx.date).toLocaleDateString()}</td>
 
                         <td className="px-6 py-5">
                           <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm">

@@ -35,6 +35,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       }
     }
     const userData = localStorage.getItem('user'); 
+
     if (userData) {
       setUser(JSON.parse(userData));
     }
