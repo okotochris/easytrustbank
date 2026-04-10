@@ -11,6 +11,8 @@ const IsVerify = require('./schema/isVerify');
 const axios = require('axios');
 const bcrypt = require('bcrypt');
 const sendOTP = require('./email/resend')
+const cloudinary = require('./cloudinary')
+const upload = require('./upload')
 
 const mongoseString = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mydb'
 mongoose.connect(mongoseString)
@@ -37,7 +39,6 @@ function generateVerificationCode() {
 app.post('/api/signup', async (req, res) => {
   try {
     const { firstName, lastName, address, password, country, currency, accountType, phone, email } = req.body;
-    console.log(req.body);
     // Your signup logic here
     const code = generateVerificationCode();
 
@@ -71,7 +72,7 @@ app.post('/api/signup', async (req, res) => {
     //     );
     // sendOTP(email, code)
     //await newUser.save();
-    const user = { firstName, lastName, email, phone, accountNumberValue };
+    const user = { firstName, lastName, email, phone, accountNumberValue, currency, photo };
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
@@ -166,9 +167,7 @@ function verifyAdminToken(req, res, next) {
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body)
     const user = await User.findOne({ email });
-    console.log(user)
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });    
     }
@@ -177,6 +176,7 @@ app.post('/api/login', async (req, res) => {
         return res.status(400).json({ message: 'Invalid email or password' });
     }
     res.status(200).json({ message: 'Login successful', user });
+    console.log(user)
     } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -199,7 +199,6 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 app.get('/api/admin/all-users', async (req, res) => {
-  console.log('visited')
   try {
     const users = await User.find().select('-password');
     console.log(users)
@@ -442,7 +441,51 @@ app.post('/api/update-profile', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+//DELETE USER ACCOUNT 
+app.delete('/api/delete', async (req, res)=>{
+  const {email} = req.query;
+  try{
+    await User.findOneAndDelete({email})
+    res.status(200).json({message:"deleted"})
+  }catch(e){
+    res.status(500).json({mssage:"Server error "})
+    console.log(e)
+  }
+})
 
+app.post('/api/update_profile', upload.single('photo'), async (req, res) => {
+  const photo = req.file;
+  const { email } = req.body;
+
+  try {
+    if (!photo) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(photo.path);
+
+    // Get image URL
+    const publicUrl = result.secure_url;
+
+    // Update user
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { photo: publicUrl },
+      { new: true }
+    );
+    const user = await User.findOne({email})
+    console.log(user, publicUrl)
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   // IsVerify.deleteMany({})
