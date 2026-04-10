@@ -32,7 +32,7 @@ export default function RegisterPage() {
     address: '',
     city: '',
     country: 'Canada',
-    currency: 'CAD',
+    currency: '$',
     accountType: 'checking',
     password: '',
     confirmPassword: '',
@@ -304,7 +304,7 @@ export default function RegisterPage() {
                         className="w-full border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 rounded-2xl px-6 py-4 focus:outline-none focus:border-blue-500 text-gray-900 dark:text-white"
                       >
                         {currencies.map((curr) => (
-                          <option key={curr.code} value={curr.code}>
+                          <option key={curr.code} value={curr.symbol}>
                             {curr.symbol} {curr.code} — {curr.name}
                           </option>
                         ))}

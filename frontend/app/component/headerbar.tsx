@@ -8,7 +8,10 @@ import {
   User, 
   Settings, 
   HelpCircle, 
-  LogOut 
+  LogOut, 
+  Clock,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 type User = {
@@ -18,6 +21,7 @@ type User = {
   phone: string;
   accountNumber: string;
   balance: number;
+  photo:string,
 };
 interface HeaderProps {
   onMenuClick: () => void;
@@ -27,6 +31,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
    const [user, setUser] = useState<User | null>(null);
+   const [notification, setNotification] = useState(false)
 
   useEffect(() => {
     async function handleClickOutside(event: MouseEvent) {
@@ -42,7 +47,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+  const notificationContent = [
+      {title:"Card Application Submitted", content:" your application has been submitted and is awaiting approval. you will be notified", date:"1 month ago"},
+      {title:"Card Application Approved", content:"your standard visa card has been approved and is now ready for use.", date:"8 months ago"},
+      {title:"Card Application Submitted", content:"your card application has been submitted and is awaiting approval. you will be notified", date:"8 months ago"}
+    ]
   return (
     <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
@@ -66,28 +75,56 @@ export default function Header({ onMenuClick }: HeaderProps) {
         <div className="flex items-center gap-4">
           
           {/* Notification */}
-          <button className="p-3 hover:bg-gray-100 rounded-2xl relative">
+          <button 
+            onClick={()=> notification ? setNotification(false) : setNotification(true)}
+            className="p-3 hover:bg-gray-100 rounded-2xl relative">
             <Bell className="w-5 h-5 text-gray-600" />
             <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
           </button>
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setOpen(!open)}
-              className="flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-zinc-800 px-2 py-1 rounded-xl transition"
-            >
-              <div className="w-9 h-9 bg-linear-to-br from-blue-500 to-indigo-500 rounded-2xl"></div>
+           <button
+            onClick={() => setOpen(!open)}
+            className="flex items-center gap-3 px-2 py-1.5 rounded-xl 
+             hover:bg-gray-100 dark:hover:bg-zinc-800 
+             transition w-full sm:w-auto"
+>
+              {/* Avatar */}
+              <div className="w-9 h-9 rounded-2xl overflow-hidden 
+                  bg-gradient-to-br from-blue-500 to-indigo-500 
+                  flex items-center justify-center text-white font-semibold text-sm">
+    
+            {user?.photo ? (
+              <img
+                src={user.photo}
+                alt="profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
+              </span>
+            )}
+  </div>
 
-              <div className="hidden sm:block text-left">
-                <p className="font-medium text-sm">{user?.firstName} {user?.lastName}</p>
-                <p className="text-xs text-gray-500 -mt-0.5">
-                  {user?.email}
-                </p>
-              </div>
+  {/* User Info */}
+  <div className="hidden sm:flex flex-col text-left leading-tight">
+    <p className="font-medium text-sm text-gray-900 dark:text-white">
+      {user?.firstName} {user?.lastName}
+    </p>
+    <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[140px]">
+      {user?.email}
+    </p>
+  </div>
 
-              <ArrowDown className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} />
-            </button>
+  {/* Dropdown Icon */}
+  <ArrowDown
+    className={`w-4 h-4 text-gray-500 transition-transform duration-200 
+                ${open ? "rotate-180" : ""}`}
+  />
+</button>
 
             {/* Dropdown */}
             {open && (
@@ -128,6 +165,62 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
         </div>
       </div>
+        {notification && 
+          <div className="absolute md:w-96 right-20  bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-xl p-2 z-50">
+            {/*Notifcation it's going to be map */} 
+            {
+              notificationContent.map((item, i)=>(
+                    <div 
+                      key={i}
+                      className="flex items-start justify-between gap-3 p-4 rounded-2xl 
+                          bg-white dark:bg-zinc-900 
+                          border border-gray-200 dark:border-zinc-800 
+                          hover:shadow-md transition">
+
+                        {/* Left Content */}
+                        <div className="flex gap-3 items-start w-full">
+                          
+                          {/* Icon */}
+                          <div className="w-10 h-10 flex items-center justify-center rounded-xl 
+                                          bg-blue-100 dark:bg-blue-500/10">
+                           {i==1 ? <AlertCircle className="w-5 h-5 text-green-600 dark:text-green-400" /> : <Check className="w-5 h-5 text-blue-600 dark:text-blue-400" />} 
+                          </div>
+
+                          {/* Text Content */}
+                          <div className="flex flex-col w-full">
+                            <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                             {item.title}
+                            </p>
+
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                              {item.content}
+                            </span>
+
+                            {/* Bottom Row */}
+                            <div className="flex items-center justify-between mt-2">
+                              
+                              {/* Time */}
+                              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{item.date}</span>
+                              </div>
+
+                              {/* Badge */}
+                              <div className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full 
+                                              bg-blue-100 text-blue-600 
+                                              dark:bg-blue-500/10 dark:text-blue-400">
+                                New
+                              </div>
+                            </div>
+                          </div>
+                  </div>
+
+            </div>
+              ))
+            }                     
+
+          </div>  
+      }
     </div>
   );
-}
+}   

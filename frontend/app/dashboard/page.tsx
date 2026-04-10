@@ -17,6 +17,7 @@ type Transaction = {
   date: string;
   category: string;
   title:string
+  currency:string
 };
 
 type User = {
@@ -26,6 +27,7 @@ type User = {
   phone: string;
   accountNumber: string;
   balance: number;
+  currency:string
 };
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -106,10 +108,10 @@ function maskAccountNumber(accountNumber: string | number): string {
 
   const accountNumber = user ? maskAccountNumber(user.accountNumber) : '';
   const accountStatementInfo = [
-    { id: 1, icon: CreditCard, title: 'Available', amount: user?.balance, footer: 'Account Limit' },
-    { id: 2, icon: Send, title: 'This Month', amount: monthlyDeposits, footer: 'Monthly Deposits' },
-    { id: 3, icon: PiggyBank, title: 'This Month', amount: monthlyExpenses, footer: 'Monthly Expenses' },
-    { id: 4, icon: CreditCard, title: 'All Time', amount: totalVolume, footer: 'Total Volume' },
+    { id: 1, icon: CreditCard, color: 'blue-500',  title: 'Available', amount: user?.balance, footer: 'Account Limit' },
+    { id: 2, icon: Send, color:"green-500", title: 'This Month', amount: monthlyDeposits, footer: 'Monthly Deposits' },
+    { id: 3, icon: PiggyBank, color:"red-500", title: 'This Month', amount: monthlyExpenses, footer: 'Monthly Expenses' },
+    { id: 4, icon: CreditCard, color:"orange-500", title: 'All Time', amount: totalVolume, footer: 'Total Volume' },
   ];
 
   return (
@@ -138,13 +140,15 @@ function maskAccountNumber(accountNumber: string | number): string {
                   key={info.id} 
                   className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-6 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-600 dark:text-gray-400">
-                    <Icon className="w-6 h-6" />
+                  <div
+                    className={`w-12 h-12 rounded-2xl bg-${info.color} flex items-center justify-center text-gray-600 dark:text-gray-400`}
+                  >
+                    <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">{info.title}</p>
                     <p className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-                      ${info.amount?.toLocaleString()}
+                     {user?.currency} {info.amount?.toLocaleString()}
                     </p>
                     <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">{info.footer}</p> 
                   </div>
@@ -202,7 +206,7 @@ function maskAccountNumber(accountNumber: string | number): string {
 
                     <div className="flex flex-col gap-1">
                       <p className="text-blue-200 text-sm">Fiat Balance</p>
-                      <h2 className="text-lg font-semibold font-mono tracking-tighter">${user?.balance?.toLocaleString() || "0.00"}</h2>
+                      <h2 className="text-lg font-semibold font-mono tracking-tighter">{user?.currency}{user?.balance?.toLocaleString() || "0.00"}</h2>
                       <span className="text-blue-200 text-sm">USD Balance</span>
                     </div>
                   </div>
@@ -211,7 +215,7 @@ function maskAccountNumber(accountNumber: string | number): string {
                   <div className="flex flex-col md:items-end gap-8">
                     <div className="text-right">
                       <p className="text-blue-200 text-sm">Total Portfolio</p>
-                      <h2 className="text-lg font-semibold font-mono tracking-tighter">$0.00</h2>
+                      <h2 className="text-lg font-semibold font-mono tracking-tighter">{user?.currency}0.00</h2>
                     </div>
 
                     <div className="flex gap-4">
@@ -267,7 +271,7 @@ function maskAccountNumber(accountNumber: string | number): string {
                   <div>
                     <p className="text-gray-500 dark:text-gray-400">Credit Card</p>
                     <p className="text-4xl font-bold mt-6 text-gray-900 dark:text-white">
-                      ${user?.balance?.toLocaleString() || "0.00"}
+                      {user?.currency}{user?.balance?.toLocaleString() || "0.00"}
                     </p>
                     <p className="text-emerald-600 dark:text-emerald-400 mt-2 text-sm">Available Credit</p>
                   </div>
@@ -306,7 +310,7 @@ function maskAccountNumber(accountNumber: string | number): string {
                   <div key={tx.id} className="px-6 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center
-                        ${tx.type === 'credit' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-red-100 dark:bg-red-950 text-red-600'}`}>
+                        {tx.currency}{tx.type === 'credit' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-red-100 dark:bg-red-950 text-red-600'}`}>
                         {tx.type === 'credit' ? <ArrowUpRight size={26} /> : <ArrowDownRight size={26} />}
                       </div>
                       <div>
@@ -315,7 +319,7 @@ function maskAccountNumber(accountNumber: string | number): string {
                       </div>
                     </div>
                     <p className={`font-semibold text-lg ${tx.type === 'credit' ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {tx.type === 'credit' ? '+' : '-'}${tx.amount.toFixed(2)}
+                      {tx.type === 'credit' ? '+' : '-'}{tx?.currency}{tx.amount.toFixed(2)}
                     </p>
                   </div>
                 )):

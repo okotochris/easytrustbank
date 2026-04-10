@@ -45,7 +45,7 @@ export default function PinLogin() {
       return;
     }
     const userData = JSON.parse(user);
-    console.log(userData);
+
     const email = userData.email;
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verify-pin`, {
         method: 'POST',
@@ -69,7 +69,9 @@ export default function PinLogin() {
 
     } catch (err) {
       setMessage('Server error ❌');
-    } 
+    }finally{
+      setLoading(false)
+    }
   };
 
   return (

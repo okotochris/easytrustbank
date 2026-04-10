@@ -1,26 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Shield, Bell, Lock, User, Globe, Moon, Sun, LogOut, Trash2, Eye, EyeOff, Upload, Camera 
 } from 'lucide-react';
 import Sidebar from '@/app/component/Sidebar';
 import Header from '@/app/component/headerbar';
+import { useRouter } from 'next/navigation';
+import FancyLoader from '@/app/component/loading';
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+  currency:string
+};
+
 
 export default function SettingsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
   const [activeItem, setActiveItem] = useState<string>('Settings');
-
+  const [isLoading, setIsLoading] = useState(false)
   // Profile Picture State
   const [profileImage, setProfileImage] = useState<string>('/default-avatar.png'); // Default avatar
   const [isUploading, setIsUploading] = useState(false);
 
   // Form States
-  const [fullName, setFullName] = useState('John Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [phone, setPhone] = useState('+234 801 234 5678');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter()
+  useEffect(()=>{
+    async function getUser(){
+      const userData = localStorage.getItem('user');
+      if(userData){
+        
+        const userInfo = JSON.parse(userData)
+        setUser(userInfo)
+      }else{
+        router.push('/login')
+      }
+      
+    }
+    getUser()
+  }, [])
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -33,24 +62,43 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('English');
 
   // Handle Profile Picture Upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    setIsUploading(true);
+  setIsUploading(true);
+  setIsLoading(true)
+  try {
+    const formData = new FormData();
+    const email = user?.email
+    formData.append("photo", file);
+    if (email) {
+      formData.append("email", email); // make sure you have this
+    }
 
-    // Simulate upload delay
-    setTimeout(() => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setProfileImage(event.target?.result as string);
-        setIsUploading(false);
-        alert("✅ Profile picture updated successfully!");
-      };
-      reader.readAsDataURL(file);
-    }, 1200);
-  };
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/update_profile`, {
+      method: "POST",
+      body: formData,
+    });
 
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Upload failed");
+    }
+
+    // Set image from backend (Cloudinary URL)
+    setProfileImage(data.user.photo);
+
+    alert("✅ Profile picture updated successfully!");
+  } catch (error: any) {
+    console.error(error);
+    alert(error.message || "Something went wrong");
+  } finally {
+    setIsUploading(false);
+    setIsLoading(false)
+  }
+};
   const handleSaveProfile = () => {
     alert("✅ Profile updated successfully!");
   };
@@ -308,7 +356,10 @@ export default function SettingsPage() {
                 <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-red-100 dark:border-red-900">
                   <h3 className="font-semibold text-red-600 dark:text-red-400 mb-6">Danger Zone</h3>
                   
-                  <button className="w-full flex items-center justify-center gap-3 py-4 border border-red-300 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950 text-red-600 dark:text-red-400 rounded-2xl font-medium transition">
+                  <button 
+                    onClick={() => router.push('/login')}
+                    className="w-full flex items-center justify-center gap-3 py-4 border border-red-300 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950 text-red-600 dark:text-red-400 rounded-2xl font-medium transition"
+                  >
                     <LogOut className="w-5 h-5" />
                     Sign Out
                   </button>
@@ -323,6 +374,7 @@ export default function SettingsPage() {
           </div>
         </main>
       </div>
+      {isLoading && <FancyLoader fullScreen message="Verifying PIN...." /> }
     </div>
   );
 }
