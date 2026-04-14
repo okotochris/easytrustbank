@@ -305,7 +305,7 @@ function maskAccountNumber(accountNumber: string | number): string {
           Transaction Limit
         </p>
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          {user?.currency}500,000.00
+          {user?.currency}200,000.00
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Daily limit available
