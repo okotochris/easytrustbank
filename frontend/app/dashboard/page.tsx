@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Sidebar from '../component/Sidebar';
 import Header from '../component/headerbar';
-import { ArrowUpRight, ArrowDownRight, Receipt, UserPlus, Building2, Send, PiggyBank, CreditCard, Plus } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Receipt, UserPlus, Building2, Send, PiggyBank, CreditCard, Plus, GitGraph, AlertCircle, Clock, TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FancyLoader from '../component/loading';
 import { url } from 'inspector';
@@ -279,20 +279,87 @@ function maskAccountNumber(accountNumber: string | number): string {
                 </div>
               </div>
 
-              {/* Quick Actions (Small) */}
-              <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-8 shadow-sm">
-                <p className="font-semibold mb-6 text-lg text-gray-900 dark:text-white">Quick Actions</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <Link href="/dashboard/transfers/local" className="bg-gray-50 dark:bg-zinc-800 hover:bg-blue-50 dark:hover:bg-blue-950 border border-gray-200 dark:border-zinc-700 hover:border-blue-200 py-7 rounded-3xl flex flex-col items-center transition-all">
-                    <Send className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-2" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">Transfer</span>
-                  </Link>
-                  <Link href="/dashboard/deposit" className="bg-gray-50 dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950 border border-gray-200 dark:border-zinc-700 hover:border-emerald-200 py-7 rounded-3xl flex flex-col items-center transition-all">
-                    <PiggyBank className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mb-2" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">Deposit</span>
-                  </Link>
-                </div>
-              </div>
+             
+              {/* ACCOUNT STATISTI */}
+<div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-6 md:p-8 shadow-sm">
+
+  {/* Header */}
+  <div className="flex items-center gap-2 mb-6">
+    <GitGraph className="w-5 h-5 text-emerald-600" />
+    <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+      Account Statistics
+    </p>
+  </div>
+
+  {/* Stats Column */}
+  <div className="flex flex-col gap-4">
+
+    {/* Transaction Limit */}
+    <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40 hover:shadow-md transition">
+      <div className="p-3 bg-yellow-500/90 rounded-xl">
+        <CreditCard className="text-white w-5 h-5" />
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Transaction Limit
+        </p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+          {user?.currency}500,000.00
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Daily limit available
+        </p>
+      </div>
+    </div>
+
+    {/* Pending Transactions */}
+    <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40 hover:shadow-md transition">
+      <div className="p-3 bg-blue-500 rounded-xl">
+        <Clock className="text-white w-5 h-5" />
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Pending Transactions
+        </p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+          {user?.currency}10,000,000.00
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Awaiting processing
+        </p>
+      </div>
+    </div>
+
+    {/* Total Volume */}
+    <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40 hover:shadow-md transition">
+      <div className="p-3 bg-emerald-600 rounded-xl">
+        <TrendingUp className="text-white w-5 h-5" />
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Total Volume
+        </p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+          {user?.currency}5,825,700,889.06
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          All-time transactions
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  {/* Footer */}
+  <div className="flex justify-center items-center gap-2 mt-6 text-sm text-gray-500 dark:text-gray-400">
+    <Clock className="w-4 h-4" />
+    <p>Updated in real-time</p>
+  </div>
+
+</div>
             </div>
 
             {/* Recent Transactions */}

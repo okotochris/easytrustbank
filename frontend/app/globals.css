@@ -50,3 +50,16 @@ body {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #6b7280;
 }
+@keyframes spinReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg) translateX(var(--orbit-radius, 40px)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(var(--orbit-radius, 40px)) rotate(-360deg);
+  }
+}

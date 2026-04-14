@@ -149,7 +149,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
               </button>
             ) : (
               <Link
-               href={'/login'}
+               href={'/dashboard'}
                 className="px-7 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
               >
                 Login

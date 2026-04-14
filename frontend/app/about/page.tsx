@@ -78,6 +78,54 @@ export default function About() {
       </section>
 
       {/* Story Section */}
+     <div className="rounded-3xl p-8 md:p-12 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-lg">
+
+  {/* Header */}
+  <div className="text-center max-w-2xl mx-auto mb-10">
+    <h2 className="text-2xl md:text-3xl font-bold">
+      By the Numbers
+    </h2>
+    <p className="text-blue-100 mt-2">
+      Our growth reflects the trust our customers place in us
+    </p>
+  </div>
+
+  {/* Stats */}
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+    {/* Stat */}
+    <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-6 text-center hover:bg-white/20 transition">
+      <h2 className="text-3xl md:text-4xl font-extrabold">
+        $2.5B
+      </h2>
+      <p className="text-blue-100 mt-2 text-sm">
+        Assets Under Management
+      </p>
+    </div>
+
+    {/* Stat */}
+    <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-6 text-center hover:bg-white/20 transition">
+      <h2 className="text-3xl md:text-4xl font-extrabold">
+        25
+      </h2>
+      <p className="text-blue-100 mt-2 text-sm">
+        Branch Locations
+      </p>
+    </div>
+
+    {/* Stat */}
+    <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-6 text-center hover:bg-white/20 transition">
+      <h2 className="text-3xl md:text-4xl font-extrabold">
+        99.9%
+      </h2>
+      <p className="text-blue-100 mt-2 text-sm">
+        Uptime Guarantee
+      </p>
+    </div>
+
+  </div>
+
+</div>
       <section className="py-24 bg-white dark:bg-zinc-900">
         <div className="max-w-4xl mx-auto px-6">
           <div className="prose prose-lg dark:prose-invert max-w-none space-y-8 text-gray-700 dark:text-gray-300">
