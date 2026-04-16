@@ -7,6 +7,7 @@
   } from 'lucide-react';
   import Sidebar from '@/app/component/Sidebar';
   import Header from '@/app/component/headerbar';
+import { useRouter } from 'next/navigation';
 
   type User = {
   firstName: string;
@@ -20,20 +21,32 @@
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [openSection, setOpenSection] = useState<string>('Dashboard');
     const [activeItem, setActiveItem] = useState<string>('Deposit');
-
     const [selectedMethod, setSelectedMethod] = useState<string>('');
     const [amount, setAmount] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [proofFile, setProofFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
      const [user, setUser] = useState<User | null>(null);
+     const router = useRouter()
 
      useEffect(()=>{
       async function getUser(){
         const storedUser = localStorage.getItem('user');
       if (storedUser) {
-        const userData: User = JSON.parse(storedUser);
-        setUser(userData);
+        const user = JSON.parse(storedUser)
+        try{
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history?email=${user.email}`);
+            if(response.ok){
+              const data = await response.json()
+                setUser(data.user);
+            }
+        }
+        catch(err){
+          console.log(err)
+        }
+       
+      }else{
+        router.push('/login')
       }
       }
       getUser()

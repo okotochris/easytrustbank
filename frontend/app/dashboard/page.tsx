@@ -51,7 +51,6 @@ export default function Dashboard() {
               const data = await response.json();
               setRecentTransactions(data.history);
               setUser(data.user);
-              console.log(data)
               // setAccountStatementInfo(data.accountStatementInfo);
             } else {
               console.error('Failed to fetch user data');
