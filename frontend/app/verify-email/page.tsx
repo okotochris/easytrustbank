@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import FancyLoader from "../component/loading";
+import { useRouter } from "next/navigation";
 
 export default function VerifyPage() {
   const length = 5;
@@ -9,7 +10,7 @@ export default function VerifyPage() {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
-
+  const router = useRouter()
   useEffect(() => {
     inputsRef.current[0]?.focus();
    async function getEmailFromStorage() {
@@ -67,11 +68,13 @@ export default function VerifyPage() {
       }
         const data = await res.json()
         localStorage.setItem('user', JSON.stringify(data))
-        window.location.href = '/verify-email/set_pin';
-         setIsLoading(false);
+       router.push('/verify-email/set_pin') ;
+        
     }
     catch(err){
       console.log(err)
+    }finally{
+       setIsLoading(false);
     }
     
   }

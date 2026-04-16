@@ -1,17 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ArrowRight, RefreshCw, Plus, Shield, Lock, Clock, Banknote, ChevronDown 
 } from 'lucide-react';
 import Sidebar from '@/app/component/Sidebar';
 import Header from '@/app/component/headerbar';
+import { useRouter } from 'next/navigation';
+import FancyLoader from '@/app/component/loading';
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+  photo:string,
+  currency:string
+};
 
 export default function LocalTransferPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
   const [activeItem, setActiveItem] = useState<string>('Local Transfer');
-
   const [amount, setAmount] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -19,9 +31,10 @@ export default function LocalTransferPage() {
   const [accountType, setAccountType] = useState('');
   const [routingNumber, setRoutingNumber] = useState('');
   const [description, setDescription] = useState('');
-
+  const [user, setUser] = useState<User | null>(null)
   const [showPreview, setShowPreview] = useState(false);
-
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
   const quickAmounts = [100, 500, 1000, 5000];
 
   const accountTypes = [
@@ -34,7 +47,33 @@ export default function LocalTransferPage() {
   ];
 
   const handleQuickAmount = (value: number) => setAmount(value.toString());
+  useEffect(()=>{
+    async function getUser(){
+       setLoading(true)
+      try{
+        const userData = localStorage.getItem('user'); 
+        if(!userData){
+          router.push('/login')
+          return 
+        }
+        const email = JSON.parse(userData).email
+         const responseUser = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user?email=${email}`);
+         if(!responseUser){
+          console.log("No user fouond")
+         }
+         const userResData = await responseUser.json()
+         setUser(userResData)
 
+      }
+      catch(err){
+        console.log(err)
+      }finally{
+        setLoading(false)
+      }
+      
+    }
+    getUser()
+  }, [])
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-zinc-950">
       
@@ -94,7 +133,7 @@ export default function LocalTransferPage() {
                   <div className="bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-2xl p-6 mb-10 flex items-center justify-between">
                     <div>
                       <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Available Balance</p>
-                      <p className="text-4xl font-semibold text-blue-700 dark:text-blue-300 mt-1">$12,487.65</p>
+                      <p className="text-4xl font-semibold text-blue-700 dark:text-blue-300 mt-1">{user?.currency}{user?.balance.toLocaleString()}</p>
                       <p className="text-blue-600/70 dark:text-blue-400/70 text-sm mt-1">USD • Available for transfer</p>
                     </div>
                     <Banknote className="w-14 h-14 text-blue-600 dark:text-blue-400" />
@@ -104,7 +143,7 @@ export default function LocalTransferPage() {
                   <div className="mb-10">
                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-3">Transfer Amount</label>
                     <div className="relative">
-                      <span className="absolute left-6 top-5 text-4xl text-gray-400">$</span>
+                      <span className="absolute left-6 top-5 text-4xl text-gray-400">{user?.currency}</span>
                       <input
                         type="number"
                         value={amount}
@@ -125,7 +164,7 @@ export default function LocalTransferPage() {
                               : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-600'
                           }`}
                         >
-                          ${amt}
+                          {user?.currency}{amt}
                         </button>
                       ))}
                     </div>
@@ -286,7 +325,7 @@ export default function LocalTransferPage() {
               </div>
               <div className="flex justify-between py-3 border-b dark:border-zinc-700 font-semibold text-lg">
                 <span>Amount</span>
-                <span className="text-gray-900 dark:text-white">${amount || '0.00'}</span>
+                <span className="text-gray-900 dark:text-white">{user?.currency}{amount || '0.00'}</span>
               </div>
             </div>
 
@@ -310,6 +349,7 @@ export default function LocalTransferPage() {
           </div>
         </div>
       )}
+          {loading && <FancyLoader fullScreen message="fetching cards details..." /> }
     </div>
   );
 }

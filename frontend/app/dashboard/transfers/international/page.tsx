@@ -7,6 +7,18 @@ import {
 } from 'lucide-react';
 import Sidebar from '@/app/component/Sidebar';
 import Header from '@/app/component/headerbar';
+import { useRouter } from 'next/navigation';
+import FancyLoader from '@/app/component/loading';
+
+  type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+  currency:string
+};
 
 export default function InternationalTransferPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,9 +35,12 @@ export default function InternationalTransferPage() {
   const [bankName, setBankName] = useState('');
   const [swiftCode, setSwiftCode] = useState('');
   const [description, setDescription] = useState('');
-
+  const [emailError, setEmailError] = useState('')
   const [showPreview, setShowPreview] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter()
 
   const methods = [
     {
@@ -78,16 +93,49 @@ export default function InternationalTransferPage() {
 
   const handlePreview = () => {
     if (!selectedMethod || !amount) return;
+    if(!recipientEmail){
+      setEmailError("field can not be empty")
+      return
+    }
     setShowPreview(true);
   };
+  useEffect(()=>{
+    async function getUser(){
+      setLoading(true)
+      try{
+        const userData = localStorage.getItem('user'); 
+        if(!userData){
+          router.push('/login')
+          return 
+        }
+        const email = JSON.parse(userData).email
+         const responseUser = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user?email=${email}`);
+         if(!responseUser){
+          console.log("No user fouond")
+         }
+         const userResData = await responseUser.json()
+         setUser(userResData)
+
+      }
+      catch(err){
+        console.log(err)
+      }finally{
+        setLoading(false)
+      }
+      
+    }
+    getUser()
+  }, [])
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (showPreview) {
+      setLoading(true)
       timer = setTimeout(() => {
         setShowPreview(false);
+        setLoading(false)
         setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
+        setTimeout(() => setShowSuccess(false), 4000);
       }, 7000);
     }
     return () => clearTimeout(timer);
@@ -177,7 +225,7 @@ export default function InternationalTransferPage() {
                         <div className="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex justify-between text-[10px] leading-none">
                           <div>
                             <span className="text-gray-500 dark:text-gray-400 block">Fee</span>
-                            <span className="font-medium text-gray-900 dark:text-white">${method.fee}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{user?.currency}{method.fee}</span>
                           </div>
                           <div className="text-right">
                             <span className="text-gray-500 dark:text-gray-400 block">Time</span>
@@ -198,7 +246,7 @@ export default function InternationalTransferPage() {
                             Sending via {methods.find(m => m.id === selectedMethod)?.name}
                           </p>
                           <p className="text-3xl font-semibold text-blue-700 dark:text-blue-300 mt-1">
-                            ${amount || '0.00'} <span className="text-xl text-blue-600 dark:text-blue-400">{currency}</span>
+                            {user?.currency}{amount || '0.00'} <span className="text-xl text-blue-600 dark:text-blue-400">{currency}</span>
                           </p>
                         </div>
                         <div className="text-right">
@@ -231,7 +279,7 @@ export default function InternationalTransferPage() {
                       <div>
                         <label className="block text-gray-700 dark:text-gray-300 font-medium mb-3">Amount to Send</label>
                         <div className="relative">
-                          <span className="absolute left-6 top-1/2 -translate-y-1/2 text-4xl text-gray-400">$</span>
+                          <span className="absolute left-6 top-1/2 -translate-y-1/2 text-4xl text-gray-400">{user?.currency}</span>
                           <input
                             type="number"
                             value={amount}
@@ -246,7 +294,8 @@ export default function InternationalTransferPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {(selectedMethod === 'paypal' || selectedMethod === 'cashapp' || selectedMethod === 'wise') && (
                           <div className="md:col-span-2">
-                            <label className="text-gray-700 dark:text-gray-300 font-medium mb-2 block">Recipient Email or $Cashtag</label>
+                            <label className="text-gray-700 dark:text-gray-300 font-medium mb-2 block">Recipient Email or $Cashtag <span className='text-red-500'>{emailError}</span></label>
+                            
                             <input
                               type="text"
                               value={recipientEmail}
@@ -352,6 +401,7 @@ export default function InternationalTransferPage() {
               </div>
             </div>
           </div>
+            {loading && <FancyLoader fullScreen message="fetching cards details..." /> }
         </main>
       </div>
 
@@ -381,10 +431,16 @@ export default function InternationalTransferPage() {
                   {methods.find(m => m.id === selectedMethod)?.name}
                 </span>
               </div>
+                <div className="flex justify-between py-3 border-b dark:border-zinc-700">
+                <span className="text-gray-500 dark:text-gray-400">Recipient Email / Cashtag</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {recipientEmail}
+                </span>
+              </div>
               <div className="flex justify-between py-3 border-b dark:border-zinc-700">
                 <span className="text-gray-500 dark:text-gray-400">Amount</span>
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  ${amount} {currency}
+                  {user?.currency}{amount} {currency}
                 </span>
               </div>
               <div className="flex justify-between py-3 border-b dark:border-zinc-700">

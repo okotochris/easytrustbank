@@ -18,7 +18,6 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTheme } from './theme-provider';
-import { url } from 'inspector';
 import Logo from './logo';
 
 interface HeaderProps {

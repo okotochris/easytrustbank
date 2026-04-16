@@ -2,9 +2,9 @@ const { Resend } = require('resend'); // destructure Resend
 require('dotenv').config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const sender = 'onboarding@resend.dev';
-const EasyTrustGlobal = 'StudyNest';
-const companyName = 'StudyNest';
+const sender = 'otp@studynest.com.ng';
+const EasyTrustGlobal = 'EasyTrustBank';
+const companyName = 'EasyTrustBank';
 
 async function sendOTP(email, code) {
   const htmlText = `

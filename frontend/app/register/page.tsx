@@ -88,9 +88,9 @@ export default function RegisterPage() {
       }
       localStorage.setItem('email', formData.email);
       const data = await response.json();
-      localStorage.setItem('user',  JSON.stringify(data));
-      window.location.href = '/verifying-email';
-      // window.location.href = '/verify-email';
+      //localStorage.setItem('user',  JSON.stringify(data));
+     // window.location.href = '/verifying-email';
+      window.location.href = '/verify-email';
       setIsLoading(false);
     }
     catch(error){

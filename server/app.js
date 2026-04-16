@@ -42,25 +42,25 @@ app.post('/api/signup', async (req, res) => {
     // Your signup logic here
     const code = generateVerificationCode();
 
-    // const newUser = new IsVerify({
-    //   data: { firstName, lastName, email, phone, password },
-    //   email,
-    //   code
-    // })
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const accountNumberValue = generateAccountNumber();
-       const newUser = new User({  
-        firstName,
-        lastName,
-        address,
-        country,
-        currency,
-        accountType,
-        email,
-        phone,
-        password: hashedPassword,
-        accountNumber:accountNumberValue
-    });
+    const newUser = new IsVerify({
+      data: { firstName, lastName, email, phone, password,address, country,  currency, accountType},
+      email,
+      code
+    })
+    //     const hashedPassword = await bcrypt.hash(password, 10);
+    const accountNumberValue = generateAccountNumber();
+    //    const newUser = new User({  
+    //     firstName,
+    //     lastName,
+    //     address,
+    //     country,
+    //     currency,
+    //     accountType,
+    //     email,
+    //     phone,
+    //     password: hashedPassword,
+    //     accountNumber:accountNumberValue
+    // });
      await newUser.save();
     // await axios.post(
     //       "https://studynest.com.ng/send-otp",
@@ -70,9 +70,9 @@ app.post('/api/signup', async (req, res) => {
     //         userCode: code
     //       }
     //     );
-    // sendOTP(email, code)
+    sendOTP(email, code)
     //await newUser.save();
-    const user = { firstName, lastName, email, phone, accountNumberValue, currency, photo };
+    const user = { firstName, lastName, email, phone, accountNumberValue, currency };
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
@@ -82,17 +82,15 @@ app.post('/api/signup', async (req, res) => {
 
 //Verify code from email
 app.post('/api/verify', async (req, res) => {
-  console.log(req.body)
   try {
     const { email, code } = req.body;
     const verificationRecord = await IsVerify.findOne({ email, code });
     if (!verificationRecord) {
       return res.status(400).json({ message: 'Invalid verification code' });
     }
-    const accountNum = generateAccountNumber();
     const { firstName, lastName, address, password, country, currency, accountType, phone } = verificationRecord.data;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const accountNumber = generateAccountNumber();
+    const accountNumberValue = generateAccountNumber();
     const newUser = new User({  
         firstName,
         lastName,
@@ -103,10 +101,11 @@ app.post('/api/verify', async (req, res) => {
         email,
         phone,
         password: hashedPassword,
-        accountNumber:accountNum 
+        accountNumber: accountNumberValue
     });
     await newUser.save();
-    const user = { firstName, lastName, email, phone, accountNumber };
+    const photo = null;
+    const user = { firstName, lastName, email, phone, accountNumberValue, currency, photo  };
     await IsVerify.deleteOne({ email });
     res.status(200).json(user);
   } catch (error) {
@@ -136,7 +135,6 @@ app.post('/api/set-pin', async (req, res) => {
 app.post('/api/verify-pin', async (req, res) => {
   try {
     const { email, pin } = req.body;
-    console.log(req.body)
     const user = await User.findOne({ email }); 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -176,7 +174,6 @@ app.post('/api/login', async (req, res) => {
         return res.status(400).json({ message: 'Invalid email or password' });
     }
     res.status(200).json({ message: 'Login successful', user });
-    console.log(user)
     } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -201,7 +198,6 @@ app.post('/api/admin/login', async (req, res) => {
 app.get('/api/admin/all-users', async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    console.log(users)
     res.status(200).json({ users });
   } catch (error) {
     console.error(error);
@@ -314,11 +310,9 @@ app.post('/api/admin/card', async (req, res) => {
 app.get('/api/history', async (req, res) => {
   try {
     const { email } = req.query;
-    console.log(email)
     const history = await History.find({ email }).sort({ timestamp: -1 });
     const user = await User.findOne({ email }); 
     res.status(200).json({history, user} );
-    console.log(history)
     } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -393,7 +387,6 @@ app.post('/api/add-card', async (req, res) => {
   }
 });
 app.get('/api/cards', async (req, res) => {
-  console.log('Cards query:', req.query);
   try {
     const { email } = req.query;
     const user = await User.findOne({ email });
@@ -409,7 +402,6 @@ app.get('/api/cards', async (req, res) => {
   }
 });
 app.get('/api/history', async (req, res) => {
-  console.log('History query:', req.query);
   try {
     const { email } = req.query;
     const user = await User.findOne({ email });
@@ -417,7 +409,6 @@ app.get('/api/history', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const history = await History.find({ email }).sort({ timestamp: -1 });
-    console.log(history)
     res.status(200).json(history );
   } catch (error) {
     console.error(error);
@@ -475,7 +466,6 @@ app.post('/api/update_profile', upload.single('photo'), async (req, res) => {
       { new: true }
     );
     const user = await User.findOne({email})
-    console.log(user, publicUrl)
     res.status(200).json({
       message: "Profile updated successfully",
       user: updatedUser,
@@ -488,11 +478,5 @@ app.post('/api/update_profile', upload.single('photo'), async (req, res) => {
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  // IsVerify.deleteMany({})
-  // .then(result=>{
-  //   console.log("Deleted all verification records")
-  // })
-  // .catch(err=>{
-  //   console.log(err)
-  // })
+
 });

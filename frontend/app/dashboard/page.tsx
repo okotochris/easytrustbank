@@ -18,6 +18,7 @@ type Transaction = {
   category: string;
   title:string
   currency:string
+  status:string
 };
 
 type User = {
@@ -96,6 +97,19 @@ function maskAccountNumber(accountNumber: string | number): string {
   const last4 = str.slice(-4);
   return '********' + last4;
 }
+//calculate total Pending Transaction 
+function pendingTransaction() {
+  let totalPendingTransaction = 0;
+
+  recentTransactions.forEach(item => {
+    if (item.status === 'pending') {
+      totalPendingTransaction += item.amount;
+    }
+  });
+
+  return totalPendingTransaction;
+}
+  //page Header
   let monthlyDeposits = 0
   let monthlyExpenses = 0
   let totalVolume = 0
@@ -323,7 +337,7 @@ function maskAccountNumber(accountNumber: string | number): string {
           Pending Transactions
         </p>
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          {user?.currency}10,000,000.00
+          {user?.currency}{pendingTransaction()}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Awaiting processing
@@ -342,7 +356,7 @@ function maskAccountNumber(accountNumber: string | number): string {
           Total Volume
         </p>
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          {user?.currency}5,825,700,889.06
+          {user?.currency}{totalVolume}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           All-time transactions

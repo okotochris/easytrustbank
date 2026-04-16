@@ -88,9 +88,8 @@ export default function CardsPage() {
       }
       fetchCards(); 
     },[])
-  const activeCardsCount = myCards.filter(card => card.status === 'Active').length;
+
   const pendingApplications = 0;
-  const totalBalance = myCards.reduce((sum, card) => sum + card.balance, 0);
 
   const toggleCvv = (id: number) => {
     setShowCvv(prev => ({ ...prev, [id]: !prev[id] }));
