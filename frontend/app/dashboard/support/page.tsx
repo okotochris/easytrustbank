@@ -183,7 +183,7 @@ export default function SupportPage() {
                       </div>
                       <div>
                         <p className="font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Call Us</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">+234 801 234 5678</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400"> +33 1 76 54 32 10</p>
                       </div>
                     </a>
 

@@ -3,7 +3,6 @@
 
 import { 
   ArrowRight, 
-  Banknote, 
   Menu, 
   X, 
   ChevronDown,
@@ -104,7 +103,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
                   {services.map((service, index) => {
                     const Icon = service.icon;
                     return (
-                      <a 
+                      <Link 
                         key={index}
                         href={service.url}
                         className="group/item flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
@@ -118,7 +117,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Secure and reliable solutions</p>
                         </div>
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
@@ -198,8 +197,8 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
         {/* Mobile Menu - Also Beautiful */}
         {isMobileMenuOpen && (
           <div className="md:hidden mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-1 text-base">
-            <a href="#" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">Home</a>
-            <a href="#" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">About</a>
+            <Link href="/" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">Home</Link>
+            <Link href="/about" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">About</Link>
 
             {/* Mobile Services */}
             <div>
@@ -216,23 +215,23 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps = 
                   {services.map((service, index) => {
                     const Icon = service.icon;
                     return (
-                      <a 
+                      <Link 
                         key={index}
-                        href="#" 
+                        href={service.url} 
                         className="flex items-center gap-3 py-3 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl"
                       >
                         <div className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                           <Icon className={`w-4 h-4 ${service.color}`} />
                         </div>
                         <span>{service.name}</span>
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
               )}
             </div>
 
-            <a href="#" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">Contact</a>
+            <Link href="/contact" className="py-3.5 px-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl">Contact</Link>
 
             {/* Mobile Action Buttons */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-3 px-2">
