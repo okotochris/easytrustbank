@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
     data:{
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
-        email: { type: String, required: true, unique: true },
+        email: { type: String, required: true},
         address: { type: String },
         city: { type: String },
         country: { type: String },
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
         phone: { type: String }, 
         password: { type: String, required: true },
         },
-        email: { type: String, required: true, unique: true },
+        email: { type: String, required: true },
         code: { type: String, required: true },
         createdAt: { type: Date, default: Date.now }
 });
