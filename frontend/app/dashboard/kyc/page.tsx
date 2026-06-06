@@ -1,14 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ArrowRight, Shield, CheckCircle, X, Upload, Camera, UserCheck } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { CheckCircle, Upload, Camera, UserCheck } from 'lucide-react';
 import Sidebar from '@/app/component/Sidebar';
 import Header from '@/app/component/headerbar';
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  balance: number;
+  currency: string;
+};
 
 export default function KycPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState<string>('Dashboard');
   const [activeItem, setActiveItem] = useState<string>('KYC');
+  const [user, setUser] = useState<User | null>(null);
 
   // Step control: 1 = Terms & Conditions, 2 = KYC Form
   const [step, setStep] = useState(1);
@@ -28,6 +39,21 @@ export default function KycPage() {
   const [selfie, setSelfie] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+
+  //GET USER DATA FROM LOCAL STORAGE
+    useEffect(() => {
+      async function getUser() {
+        const userData = localStorage.getItem("user");
+      if (!userData) {
+        window.location.href = "/login";
+        return;
+
+      }
+      setUser(JSON.parse(userData));
+      }
+      getUser() 
+    }, []);
 
   const handleChange = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
 ) => {
@@ -100,7 +126,7 @@ export default function KycPage() {
 
                 <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
                   <h2 className="text-3xl font-semibold mb-6 text-gray-900 dark:text-white">Welcome to Prime West United Bank</h2>
-                  <p className="text-lg">Dear Chris Okoto,</p>
+                  <p className="text-lg">Dear {user?.firstName} {user?.lastName || "User"},</p>
                   <p className="mt-6">
                     Welcome Onboard! Prime West United Bank is the market most innovative and fastest-growing company in the financial industry. 
                     We look forward to working with you to help you get the most out of our financial services and realize your banking goals.

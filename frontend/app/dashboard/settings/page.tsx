@@ -89,6 +89,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     // Set image from backend (Cloudinary URL)
     setProfileImage(data.user.photo);
+    localStorage.setItem("user", JSON.stringify(data.user)); // Update localStorage with new user data
 
     alert("✅ Profile picture updated successfully!");
   } catch (error: any) {
