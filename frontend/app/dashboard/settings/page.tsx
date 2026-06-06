@@ -42,6 +42,10 @@ export default function SettingsPage() {
       if(userData){
         
         const userInfo = JSON.parse(userData)
+        setProfileImage(userInfo.photo || '/default-avatar.png')
+        setFullName(userInfo.fullname || '')
+        setEmail(userInfo.email || '')
+        setPhone(userInfo.phone || '')
         setUser(userInfo)
       }else{
         router.push('/login')
