@@ -443,6 +443,18 @@ app.delete('/api/delete', async (req, res)=>{
     console.log(e)
   }
 })
+app.patch('/reset_password/:id', async(req, res)=>{
+  const password = req.body.password;
+  const id = req.params.id
+  try{
+    const hashPassword =await bcrypt.hash(password, 10)
+    await User.findOneAndUpdate({_id:id}, {password:hashPassword},{new:true})
+    res.status(200).json({message:"password updated"})
+  }catch(err){
+    console.log(err)
+  }
+
+})
 
 app.post('/api/update_profile', upload.single('photo'), async (req, res) => {
   const photo = req.file;

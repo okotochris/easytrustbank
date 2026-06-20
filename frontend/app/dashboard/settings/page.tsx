@@ -35,7 +35,10 @@ export default function SettingsPage() {
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const router = useRouter()
+
   useEffect(()=>{
     async function getUser(){
       const userData = localStorage.getItem('user');
@@ -104,11 +107,50 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsLoading(false)
   }
 };
-  const handleSaveProfile = () => {
-    alert("✅ Profile updated successfully!");
+  const handleSaveProfile = async () => {
+    try{
+      fetch(``,{
+        method:"PATCH",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({fullName})
+      })
+      alert("✅ Profile updated successfully!");
+      
+    }catch(err){
+      console.log(err)
+    }
   };
 
-  const handleSaveSecurity = () => {
+  const handleSaveSecurity = async () => {
+    if(password !== confirmPassword){
+      alert("password didn't match")
+      return
+    }
+    const savedUser = localStorage.getItem('user')
+    if(!savedUser){
+      router.push('/login')
+      return
+    }
+    const user =JSON.parse(savedUser)
+    const id = user._id
+     try{
+      setIsLoading(true)
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reset_password/${id}`,{
+        method:"PATCH",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({password})
+      })
+      if(!result.ok){
+        alert('Something went wrong')
+        return
+      }
+      alert("✅ Profile updated successfully!");
+      
+    }catch(err){
+      console.log(err)
+    }finally{
+      setIsLoading(false)
+    }
     alert("✅ Security settings saved!");
   };
 
@@ -253,6 +295,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                           type="password" 
                           className="w-full px-5 py-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl focus:outline-none focus:border-slate-500 text-gray-900 dark:text-white" 
                           placeholder="New password" 
+                          onChange={(e)=>setPassword(e.target.value)}
                         />
                       </div>
                       <div>
@@ -261,6 +304,9 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                           type="password" 
                           className="w-full px-5 py-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl focus:outline-none focus:border-slate-500 text-gray-900 dark:text-white" 
                           placeholder="Confirm password" 
+                          onChange={(e)=>{
+                            setConfirmPassword(e.target.value)
+                          }}
                         />
                       </div>
                     </div>
